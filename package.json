@@ -4,6 +4,7 @@
   "description": "A busi Component Library",
   "main": "index.js",
   "files": [
+	"busi1","busi2"
   ],
   "scripts": {
   },
