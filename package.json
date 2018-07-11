@@ -1,0 +1,20 @@
+{
+  "name": "ifbp-business",
+  "version": "3.0.1",
+  "description": "A busi Component Library",
+  "main": "index.js",
+  "files": [
+  ],
+  "scripts": {
+  },
+  "repository": {
+  },
+  "keywords": [
+  ],
+  "dependencies": {
+  },
+  "peerDependencies": {
+  },
+  "devDependencies": {
+  }
+}
