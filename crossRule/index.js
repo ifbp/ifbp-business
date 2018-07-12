@@ -1,0 +1,1 @@
+export default{addCrossRule:function(e,a,r){e.$pageMgr.addCrossRule(e,a,r)},updateOrg(e){page.$pageMgr.updateCrossOrg(e)}};
