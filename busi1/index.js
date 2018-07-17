@@ -1,5 +1,1 @@
-export default {
-  func1: function(){
-    alert('func1');
-  }
-}
+export default{func1:function(){alert("func1");alert("adfasdfaf")}};

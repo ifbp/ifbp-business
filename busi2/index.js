@@ -1,2 +1,1 @@
-import ifbpTcomp from './ifbp-tcomp.vue';
-export default ifbpTcomp;
+import ifbpTcomp from"./ifbp-tcomp.vue";export default ifbpTcomp;

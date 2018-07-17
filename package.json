@@ -4,18 +4,13 @@
   "description": "A busi Component Library",
   "main": "index.js",
   "files": [
-	"busi1","busi2","busi3","busi4"
+    "crossRule",
+    "pageModelMixin"
   ],
-  "scripts": {
-  },
-  "repository": {
-  },
-  "keywords": [
-  ],
-  "dependencies": {
-  },
-  "peerDependencies": {
-  },
-  "devDependencies": {
-  }
+  "scripts": {},
+  "repository": {},
+  "keywords": [],
+  "dependencies": {},
+  "peerDependencies": {},
+  "devDependencies": {}
 }
