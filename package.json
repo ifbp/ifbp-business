@@ -6,7 +6,8 @@
   "files": [
     "crossRule",
     "pageModelMixin",
-    "pageMixin"
+    "pageMixin",
+    "orgProcesser"
   ],
   "scripts": {},
   "repository": {},
