@@ -12,7 +12,7 @@
                 <li v-for="(item,index) in printTemplateArray" :key="item" v-if="printTemplateArray&&printTemplateArray.length>0" @click="printSelect(index)">{{printTemplateMap[item]}}</li>
             </ul>
         </el-popover>
-        <el-button v-popover:printPopover @click="printPreFn">{{buttonName}}</el-button>
+        <el-button v-popover:printPopover @click="printPreFn" :disabled="disabled" v-if="show">{{buttonName}}</el-button>
     </div>
 </template>
 <script>
@@ -38,6 +38,14 @@
         printClassName:{
             type:String,
             default:""
+        },
+        disabled:{
+            type:Boolean,
+            default:false
+        },
+        show:{
+            type:Boolean,
+            default:true
         }
     },
     data(){
@@ -54,7 +62,7 @@
                 this.printDropdownDisabled=false;
                 return;
             }else if(this.printTemplateArray.length==1){
-                let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.resultMap.localUrl+'&params='+this.resultMap.newParams+'&sendType=2';
+                let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.data.localUrl+'&params='+this.data.param+'&sendType=2';
                 window.open(printUrl, '_blank');
                 return;
             }
@@ -69,13 +77,21 @@
                 }
             }).then((res) => {
                 if (res.data.status||res.data.success) {
-                    this.resultMap = res.data.resultMap;
-                    this.printTemplateMap = res.data.resultMap.templateIDMap;
+                    this.resultMap = res.data.data;
+                    this.printTemplateMap = this.resultMap.templateIDMap;
                     this.printTemplateArray = Object.keys(this.printTemplateMap);
+                    if(this.printTemplateArray.length==0){
+                        this.$message.error('没有找到有效的打印模板');
+                        return;
+                    }
+                    if(this.resultMap.param==null||this.resultMap.param==''){
+                        this.$message.error('查询打印数据时没有指定有效参数');
+                        return;
+                    }
                     if(this.printTemplateArray.length>1){
                         this.printDropdownDisabled=false;
-                    }else{
-                        let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.resultMap.localUrl+'&params='+this.resultMap.newParams+'&sendType=2';
+                    }else if(this.printTemplateArray.length==1){
+                        let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.resultMap.localUrl+'&params='+this.resultMap.param+'&sendType=2';
                         window.open(printUrl, '_blank');
                     }
                 } else {
@@ -87,7 +103,7 @@
             });
         },
         printSelect(index){
-            let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.resultMap.localUrl+'&params='+this.resultMap.newParams+'&sendType=2';
+            let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.resultMap.localUrl+'&params='+this.resultMap.param+'&sendType=2';
             window.open(printUrl, '_blank');
         }
     },
