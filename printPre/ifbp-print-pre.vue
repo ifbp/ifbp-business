@@ -67,7 +67,7 @@
                 return;
             }
             this.$http({
-                url: '/riart/printtemplate/getPreviewURL',
+                url: '/riart/printtemplate/getPreviewUrlNew',
                 method: 'post',
                 dataType: 'json',
                 data: {
