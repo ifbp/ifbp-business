@@ -1,0 +1,1 @@
+import MdChildPage from"../mdlayout/src/mdchildpage";MdChildPage.install=function(d){d.component(MdChildPage.name,MdChildPage)};export default MdChildPage;

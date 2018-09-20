@@ -1,0 +1,1 @@
+import MdPage from"../mdlayout/src/mdpage";MdPage.install=function(a){a.component(MdPage.name,MdPage)};export default MdPage;

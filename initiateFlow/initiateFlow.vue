@@ -22,9 +22,31 @@
                     <div class="titleNumber ifbp-icon-more" style="cursor: pointer;" @mouseover="handleMouseover" @mouseout="handleMouseout"></div>
                   </div>
               </el-step>
-
+               <!-- 没有审批结束的第二步骤(不同意，拒绝，无效) -->
+              <el-step v-if='isNext && listData.length > 0 && !isEnd && (listData[listData.length-1].deleteReason == "拒绝" || listData[listData.length-1].deleteReason == "不同意" || listData[listData.length-1].deleteReason == "无效")'
+                class="refuse-status refuse-second-status">
+                  <div slot="title">
+                    <div class="titleText">
+                      <el-tooltip class="item" effect="normal" :content="secondStep" placement="top">
+                        <span>[{{listData[listData.length-1].activeName}}]{{listData[listData.length-1].userName}}</span>
+                      </el-tooltip>
+                      <p class="titleData">{{listData[listData.length-1].startTime}}</p>
+                    </div>
+                  </div>
+                  <div slot="description">
+                    <el-tooltip  
+                      class="item" 
+                      effect="normal" 
+                      :content="listData[listData.length-1].messagenote"
+                      :disabled="listData[listData.length-1].messagenote ? false : true" 
+                      placement="top">
+                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}}</span> {{listData[listData.length-1].messagenote}}</p>
+                    </el-tooltip>
+                    <div class="titleNumber ifbp-icon-close"></div>
+                  </div>
+              </el-step>
               <!-- 没审批结束的第二步骤(非同意) -->
-              <el-step v-if='isNext && listData.length > 0 && !isEnd && listData[listData.length-1].deleteReason != "同意" && listData[listData.length-1].deleteReason != "驳回"' class="second-step">
+              <el-step v-if='isNext && listData.length > 0 && !isEnd && listData[listData.length-1].deleteReason != "批准" && listData[listData.length-1].deleteReason != "驳回" && listData[listData.length-1].deleteReason != "拒绝" && listData[listData.length-1].deleteReason != "不同意" && listData[listData.length-1].deleteReason != "无效"' class="second-step">
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStep" placement="top">
@@ -71,7 +93,7 @@
               </el-step>
 
               <!-- 没审批结束的第二步骤(同意) -->
-              <el-step v-if='isNext && listData.length > 0 && !isEnd && listData[listData.length-1].deleteReason == "同意"' class="second-step-agree">
+              <el-step v-if='isNext && listData.length > 0 && !isEnd && listData[listData.length-1].deleteReason == "批准"' class="second-step-agree">
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStep" placement="top">
@@ -96,7 +118,7 @@
 
                <!-- 审批结束的第二步骤(同意) -->
               <el-step 
-                v-if='isNext && listData.length > 0 && isEnd && listData[listData.length-2].deleteReason == "同意"'
+                v-if='isNext && listData.length > 0 && isEnd && listData[listData.length-2].deleteReason == "批准"'
                 class="agree-status second-status">
                   <div slot="title">
                     <div class="titleText">
@@ -119,9 +141,9 @@
                   </div>
               </el-step>
 
-               <!-- 审批结束的第二步骤(不同意，拒绝) -->
+               <!-- 审批结束的第二步骤(不同意，拒绝，无效) -->
               <el-step 
-                v-if='isNext && listData.length > 0 && isEnd && (listData[listData.length-2].deleteReason == "拒绝" || listData[listData.length-2].deleteReason == "不同意" )'
+                v-if='isNext && listData.length > 0 && isEnd && (listData[listData.length-2].deleteReason == "拒绝" || listData[listData.length-2].deleteReason == "不同意" || listData[listData.length-2].deleteReason == "无效")'
                 class="refuse-status refuse-second-status">
                   <div slot="title">
                     <div class="titleText">
@@ -185,7 +207,7 @@
 
                <!-- 审批结束最后一步(同意) -->
               <el-step 
-                v-if='isEnd && listData.length > 0 && listData[listData.length-1].deleteReason == "同意"'
+                v-if='isEnd && listData.length > 0 && listData[listData.length-1].deleteReason == "批准"'
                 class="agree-status">
                   <div slot="title">
                     <div class="titleText">
@@ -264,7 +286,7 @@
       <div class="fl" v-if="this.params.showBtn != false || this.params.showBtn == undefined" style="margin-top:36px;margin-left:2px;">
         <!-- 待办任务不能有撤回按钮 -->
         <!-- <ul class="btnLists" v-if="this.params.stateFlage != 'his' && !isEnd && isAgree"> -->
-        <ul class="btnLists" v-if=" !isEnd">
+        <ul class="btnLists">
           <li v-for="item in consentBtn" :key="item.key">
             <el-button v-if="item.key!='assignAble'" type="primary" @click="clickButton(item.key)">{{item.value}}</el-button>
           </li>
@@ -299,7 +321,7 @@
         </ul>-->
       </div>
       <!-- 提交下拉 -->
-      <div class="statusLists" v-show="isHiddenList" style="background: #fff">
+      <div class="statusLists" v-show="isHiddenList" style="background: #fff" @mouseover="handleMouseover" @mouseout="handleMouseout">
         <a></a>
         <!-- 小三角 -->
         <span class="triangle"></span>
@@ -329,7 +351,7 @@
           <template v-if="action === 'rejectAble'">
             <el-form label-position="left">
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="请输入审批意见"></el-input>
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="驳回"></el-input>
               </el-form-item>
               <el-form-item label="驳回到：" :label-width="formLabelWidth">
                 <el-select v-model='rejectTo' placeholder="请选择节点">
@@ -346,42 +368,43 @@
           <template v-else-if="action === 'assignAble'">
             <el-form label-position="left">
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="请输入审批意见"></el-input>
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="指派"></el-input>
               </el-form-item>
               <el-form-item label="人员：" :label-width="formLabelWidth">
-                <el-ref :is-muti-select="true"
-                        :ref-code="refcode"
-                        :field="field"
-                        :template-value="refTemplateValue"
-                        width="300px"
-                        :editable="isEdit"
-                        placeholder="请选择人员">
-                </el-ref>
+                <el-select v-model='rejectTo' placeholder="请选择人员">
+                  <el-option
+                    v-for="node in nodeList"
+                    :key="node.value"
+                    :label="node.key"
+                    :value="node.value">
+                  </el-option>
+                </el-select>
               </el-form-item>
             </el-form>
           </template>
           <template v-else-if="action === 'refuseAble'">
             <el-form label-position="left">
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="请输入审批意见"></el-input>
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="不同意"></el-input>
               </el-form-item>
             </el-form>
           </template>
 
           <template v-else-if="action === 'agreeAble'">
-            <el-form label-position="left" v-if="assignstatus">
+            <el-form label-position="left">
               <el-form-item label="环节与指派：" :label-width="formLabelWidth" v-show="designateList.length">
-                <el-ref :is-muti-select="true"
-                        :ref-code="refcode"
-                        :field="field"
-                        :template-value="refTemplateValue"
-                        width="300px"
-                        :editable="isEdit"
-                        placeholder="请选择">
-                </el-ref>
+                <div v-for="item in designateList" :key="item.participants_01">
+                  <p>{{item.activityDesc}}</p>
+                  <el-select v-model="item.participants_01" multiple @change="test" placeholder="请选择">
+                    <el-option
+                      v-for="item_01 in item.allUsers"
+                      :label="item_01.name"
+                      :value="item_01.pk_user"
+                      :key="item_01.pk_user">
+                    </el-option>
+                  </el-select>
+                </div>
               </el-form-item>
-            </el-form>
-	          <el-form label-position="left">
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
                 <el-input type="textarea" v-model="opinion" :rows="2" placeholder="同意"></el-input>
               </el-form-item>
@@ -443,14 +466,15 @@ export default {
     return {
       // 审批组件
       approvalComponent: true,
+      mainProcessInstanceId:"",
       // 审批历史
       historicalApproval: [],
       // 任务结束标志
-      endActivityId: '',
+      endActivityId: "",
       // 历史记录
       historicalRecords: [],
       // 索引
-      indexKey: '',
+      indexKey: "",
       // 下环节是否被处理
       beenProcessed: false,
       isHidRevocation: false,
@@ -473,8 +497,7 @@ export default {
           passValue : this.passValue,
 		      stateFlage : this.stateFlage
         },
-      params_01: {},
-      assignstatus : false,     
+      params_01: {},    
       refcode: "alluserRef",
       field: "refcode",
       isEdit: true,
@@ -527,14 +550,13 @@ export default {
       defaultBtn:[],
       hiddenBtn:[],
       consentBtn:[],
-      multiinstanceModel:'',
-      btnValue:'',
+      multiinstanceModel:"",
+      btnValue:"",
       dialogCancelApprove:false,
       dialogTableVisible: false,
       dialogFormVisible: false,
       defaultMap: {
         assignAble: "指派",
-        weipaiAble: "委派",
         rejectAble: "驳回",
         delegateAble: "改派",
         addsignAble: "加签",
@@ -624,7 +646,9 @@ export default {
     revocation() {
       this.isHidRevocation = true;
     },
+    test(item) {
 
+    },
     checkFlow() {
       // this.dialogVisible=true;
       this.flowUrl =
@@ -712,24 +736,25 @@ export default {
     getAssignment() {
       var vm = this;
       var params = {
-        taskId: this.params.task_id
+        billType: this.params.billType,
+				billId:this.params.billId
       };
       this.$http({
-        url: "/ifbp-bpm-service/task/assign-checking",
+        url: "/riart/fbpworkflows/assign-checking",
         method: "get",
         params: params
       }).then(res => {
           if (res.data.status) {
-            vm.designateList = res.data.data.assignInfoItems;
+            vm.designateList = res.data.data;
             vm.designateList.forEach(function(item, index) {
               vm.$set(item, "participants_01", []);
               item.participants_02 = [];
             });
           } else {
-            
+            vm.designateList = [];
           }
         }).catch(() => {
-          // this.$message.error("去掉代理失败");
+          this.$message.error("获取被指派人列表失败");
         });
     },
     requestHistory() {
@@ -737,7 +762,8 @@ export default {
       var vm = this;
       this.$http({
         url: "/riart/fbpworkflows/approval-detail/"+ this.params.billType +"/"+ this.params.billId,
-        method: "get"
+        method: "get",
+        timeout:60000
       }).then(res => {
         if (res.data.status === true) {	  
            	if(!res.data.data ) {
@@ -770,7 +796,7 @@ export default {
 	              }
 	            }
 	            vm.listData = [];
-//	          vm.waitApproves = [];
+	            vm.waitApproves = [];
               vm.isEnd = res.data.data.end;
 	            var hisData = res.data.data.historicTasks;
 	            //this.multiinstanceModel = hisData[hisData.length-1].activity.properties.multiinstanceModel;
@@ -782,17 +808,20 @@ export default {
 	                  activeName: res.data.data.activeName,
 	                  startTime: Time,
 	                  compareTime: Time,
-			              messagenote : "提交",
+			              messagenote : "提交单据",
 	                });
 	                // 获取除了第一环节的代理人
 	                hisData.forEach(function(item, index) {
 	                      // 获取审批意见(将英文转为中文)
 	                      var deleteReason = "";
                         var messagenote = "";
-	                      if (item.deleteReason == "completed") {
-	                        deleteReason = "同意";
+	                      if (item.deleteReason == "submit") {
+	                        deleteReason = "提交";
+                          messagenote = "提交单据";
+	                      } else if (item.deleteReason == "completed") {
+	                        deleteReason = "批准";
                           messagenote = item.messagenote;
-	                      } else if (item.deleteReason == "jumpToActivity") {
+	                      }else if (item.deleteReason == "jumpToActivity") {
 	                        deleteReason = "驳回";
                           messagenote = item.messagenote;
 	                      }else if (item.deleteReason == "Inefficient") {
@@ -801,9 +830,6 @@ export default {
 	                      } else if (item.deleteReason == "ACTIVITI_DELETED") {
 	                        deleteReason = "驳回并中止";
                           messagenote = item.messagenote;
-	                      } else if (item.deleteReason == "withdraw") {
-	                        deleteReason = "审批后撤回";
-                          messagenote = "不同意";
 	                      } else if (item.deleteReason == "jump") {
 	                        deleteReason = "调整";
                           messagenote = item.messagenote;
@@ -860,9 +886,12 @@ export default {
 	                          //taskDispearFlag: item.taskDispearFlag,
 	                        });
 	                      } else if (deleteReason == "待审批") {
-                          vm.waitApproves = [];
 	                        var user = "";
-	                        user = "[" + item.activeName + "]" + item.check_userName;                          
+                          if(vm.waitApproves.length && vm.waitApproves.length >= 1){
+                            user =  item.check_userName;  
+                          }else{
+                            user = "[处理人] " + item.check_userName;  
+                          }                     
 	                        vm.waitApproves.push(user);
 	                      } else if (deleteReason == "审批后撤回") {
 	                        vm.listData.push({
@@ -878,7 +907,7 @@ export default {
 	                        });
 	                      }
 
-	                      if (vm.listData.length > 2) {
+	                      if (vm.listData.length >= 2) {
 	                        vm.isNext = true;
 	                      }
                       
@@ -957,7 +986,7 @@ export default {
                     // 此处应该用字典
                     if(v.deleteReasonMessage == 'completed'){
                       if(v.message.indexOf('同意') != -1){
-                        v.deleteReasonMessage = '同意';
+                        v.deleteReasonMessage = '批准';
                       } else if(v.message.indexOf('加签') != -1){
                         v.deleteReasonMessage = '加签';
                       } else if(v.message.indexOf('改派') != -1){
@@ -1032,11 +1061,7 @@ export default {
     customEvents(){
       if (this.action === "agreeAble") {
         //判断btnLists（数组）里面有没有"assignAble"，如果有的话，会出现下拉,掉接口
-        //this.btnLists.forEach(item => {
-        //  if (Object.values(item).indexOf("assignAble") != -1) {
-        //    this.getAssignment();
-        //  }
-        //});
+        this.getAssignment();
         this.dialogFormVisible = true;
       } else if (this.action === "refuseAble") {
         this.dialogFormVisible = true;
@@ -1069,7 +1094,7 @@ export default {
           });
 
       } else if (this.action === "assignAble") {
-        //this.getAssignment();
+        this.getAssignment();
 	      this.dialogFormVisible = true;
       } else if (this.action === "addsignAble") {
         this.dialogFormVisible = true;
@@ -1090,11 +1115,7 @@ export default {
         this.action = action;
         if (this.action === "agreeAble") {
           //判断btnLists（数组）里面有没有"assignAble"，如果有的话，会出现下拉,掉接口
-          this.btnLists.forEach(item => {
-            if (Object.values(item).indexOf("assignAble") != -1) {
-              this.getAssignment();
-            }
-          });
+          this.getAssignment();
           this.dialogFormVisible = true;
         } else if (this.action === "refuseAble") {
           this.dialogFormVisible = true;
@@ -1126,7 +1147,7 @@ export default {
 			        this.$message.error("获取驳回列表失败！");
           });
         } else if (this.action === "assignAble") {
-//          this.getAssignment();
+          this.getAssignment();
 	        this.dialogFormVisible = true;
         } else if (this.action === "addsignAble") {
 			      this.dialogFormVisible = true;
@@ -1184,38 +1205,40 @@ export default {
     confirm() {
       var vm = this;
       this.data = this.curdata;
-      var designateListStr = "";
-      
+      var designateListStr = "";      
   //  let url = window.location.hash.substring(1).replace('stateFlage=todo','stateFlage=his');
-      if (this.action === "agreeAble") {
-  //        this.designateList.forEach(function(item, index) {
-  //          for (var i = 0; i < item.participants_01.length; i++) {
-  //            var itemId = item.participants_01[i];
-  //            item.participants_02.push({
-  //              id: itemId
-  //            });
-  //          }
-  //        });
-  //        if (!this.designateList.length > 0) {
-  //          designateListStr = "";
-  //        } else {
-  //          designateListStr = JSON.stringify(this.designateList);
-  //        }
-          var obj = {};
-          if(this.assignstatus){
-              var user = this.refTemplateValue;
-              if (user === undefined ) {
-                this.$message({
-                type: "error",
-                message: "请选择具体指派人"
-                });
-                return;
-              }
-              
-            obj.param_assign_info = user.refcode;
-            obj.param_note = "指派";
+      if (this.action === "agreeAble") {         
+          if(this.designateList.length > 0){  
+            var selectuser = [];  
+            var activityDefId  = "";                 
+            this.designateList.forEach(function(item, index) {
+              activityDefId = item.activityDefId;
+              for (var i = 0; i < item.participants_01.length; i++) {
+                  var itemId = item.participants_01[i];
+                  selectuser.push(itemId)
+                  item.participants_02.push({
+                    id: itemId
+                  });
+                }
+            });
+            // if (!this.designateList.length > 0) {
+            //   designateListStr = "";
+            // } else {
+            //   designateListStr = JSON.stringify(this.designateList);
+            // }
+            var param_assign_value = {};
+            param_assign_value[activityDefId] = selectuser;
+            if ( this.opinion === "") {
+              this.opinion = "指派";
+              } 
+            var obj = {}; 
+            obj.param_assign_info = param_assign_value;
+            obj.param_note = this.opinion;
+            var em = {};
+            em.nolockandconsist = "Y";
             var param = JSON.stringify(obj);					
           }else{
+            var obj = {};
             if ( this.opinion === "") {
               this.opinion = "同意";
             }
@@ -1243,7 +1266,7 @@ export default {
               if (response && response.data && response.data.status === true) {                
                 this.$message({
                   type: "success",
-                  message: "已审批同意"
+                  message: "处理成功"
                 });
   //            this.$router.push(url);
                 this.requestHistory();
@@ -1300,27 +1323,31 @@ export default {
                   });
               });
           }else if (this.action === "refuseAble") {
+              if ( this.opinion === "") {
+                this.opinion = "不同意";
+              }
               var obj = {};
               obj.param_note = this.opinion;
               var param = JSON.stringify(obj);
               this.$http({
-                  url: "/riart/fbpworkflows/doAction",
+                url: "/riart/fbpworkflows/doAction",
                   method: "post",
-                  params: {
+                  data: {
                     action : "disagree",
                     param : param,
                     billType : this.params.billType,
                     billId : this.params.billId,
                     agentuserId:this.params.agentuserId,
                     pk_checkflow:""
-                  }
+                  },
+                  timeout:60000
               }).then(response => {
                 this.dialogFormVisible = false;
                 if (response && response.data && response.data.status === true) {
                   this.dialogFormVisible = false;
                   this.$message({
                     type: "success",
-                    message: "已拒绝流程"
+                    message: "已拒绝"
                   });
           //      this.$router.push(url);
                   this.requestHistory();
@@ -1347,6 +1374,9 @@ export default {
                 });
               });
         } else if (this.action === "rejectAble") {
+          if ( this.opinion === "") {
+              this.opinion = "驳回";
+            }
           // 驳回
           var obj = {};
           var param_reject_activity = this.rejectTo;
@@ -1417,17 +1447,20 @@ export default {
               });
             });
         } else if (this.action === "delegateAble") {
-          var user = this.refTemplateValue1;
+          var user = this.refTemplateValue;
           if (user === undefined ) {
-          this.$message({
-            type: "error",
-            message: "请选择具体改派人"
-          });
-          return;
+            this.$message({
+              type: "error",
+              message: "请选择具体改派人"
+            });
+            return;
+          }
+          if ( this.opinion === "") {
+            this.opinion = "改派";
           }
           var obj = {};
           obj.param_reaassign_user = user.refcode;
-          obj.param_note = "改派";
+          obj.param_note = this.opinion;
           var param = JSON.stringify(obj);
           this.$http({
           url: "/riart/fbpworkflows/doAction",
@@ -1475,14 +1508,17 @@ export default {
       } else if (this.action === "addsignAble") {
           var users = this.refTemplateValue;
           if (users === undefined ) {
-          this.$message({
-            type: "error",
-            message: "请选择具体加签人"
-          });
-          return;
+            this.$message({
+              type: "error",
+              message: "请选择具体加签人"
+            });
+            return;
+          }
+          if ( this.opinion === "") {
+            this.opinion = "加签";
           }
           var obj = {};
-          obj.param_note = "加签";
+          obj.param_note = this.opinion;
           obj.param_addApprove =  users.refcode.replace("\"","").split(",");
           var param = JSON.stringify(obj);
           this.$http({
@@ -1662,19 +1698,31 @@ export default {
         this.params = data;
       }
     },
-    // 处理传入组件的值
+    // 处理流程实例id
     doParams() {
-      var data = {};
-      var tmp;
-      var paramStr = this.childMsg.split("?")[1];
-      if (paramStr) {
-        var paramsArr = paramStr.split("&");
-        paramsArr.forEach(v => {
-          tmp = v.split("=");
-          data[tmp[0]] = decodeURIComponent(tmp[1]);
-        });
-      }
-      this.params = data;
+      var vm = this;
+      vm.$http.get("/riart/fbpworkflows/getprocessinstanceid", {
+        params: {
+            billType: vm.params.billType,
+            billId:vm.params.billId
+        }
+      }).then(response => {
+        // 获取驳回下拉列表
+        if (response.data.status === true) {
+          if(response.data.data){
+            vm.mainProcessInstanceId = response.data.data;
+            vm.approvalComponent = true;
+          }else{
+            vm.approvalComponent = false;
+          }
+          if(vm.approvalComponent){
+            vm.requestHistory();
+            vm.requestAction();
+          }
+        } 
+      }).catch(error => {
+          // vm.$message.error("获取流程实例失败！");
+      });
     },
 
     getUser() {
@@ -1717,9 +1765,7 @@ export default {
 
   },
   created() {
-      this.requestHistory();
-      this.requestAction();
-
+      this.doParams();
   },
   watch:{
     billId:function(billId){

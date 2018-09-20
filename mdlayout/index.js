@@ -1,0 +1,1 @@
+import MdLayout from"./src/mdlayout";MdLayout.install=function(o){o.component(MdLayout.name,MdLayout)};export default MdLayout;
