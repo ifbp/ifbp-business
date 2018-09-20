@@ -9,7 +9,10 @@
     "pageLazyMixin",
     "orgProcesser",
     "printPre",
-    "initiateFlow"
+    "initiateFlow",
+    "mdchildpage",
+    "mdlayout",
+    "mdpage"
   ],
   "scripts": {},
   "repository": {},
