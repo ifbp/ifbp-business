@@ -283,7 +283,7 @@
           </div>
         </div>  
       <!-- 按钮 -->
-      <div class="fl" v-if="this.params.showBtn != false || this.params.showBtn == undefined" style="margin-top:36px;margin-left:2px;">
+      <div class="fr" v-if="this.params.showBtn != false || this.params.showBtn == undefined" style="margin-top:36px;margin-left:2px;">
         <!-- 待办任务不能有撤回按钮 -->
         <!-- <ul class="btnLists" v-if="this.params.stateFlage != 'his' && !isEnd && isAgree"> -->
         <ul class="btnLists">
@@ -1837,7 +1837,7 @@ export default {
   }
   .waitAction span {
   color: #5CB0E6;
-  width:132px;
+  width:130px;
   display:inline-block;
   text-overflow : ellipsis;
   white-space : nowrap;

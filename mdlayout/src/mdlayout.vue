@@ -79,11 +79,21 @@
       },
       //宽度小于768时,点击显示左边栏 mdlayout-aside
       showMdlayoutMasterList(){
+        let winWidth=$(window).width();
         let mdlayoutAside=$(".mdlayout-aside");
         let mdlayoutMain=$(".mdlayout-main");
-        if(mdlayoutAside && mdlayoutMain){
+        if(winWidth<768){
+          if(mdlayoutAside && mdlayoutMain){
+             mdlayoutAside.css("left","0");
+          }
+        }else{
+          if(parseInt(mdlayoutAside.css("left"))<0){
             mdlayoutAside.css("left","0");
+            mdlayoutMain.css("margin-left",this.asideWidth);
+            $(".mdlayout-page .mdlayout-header-func .header-icon").css("display","none");
         }
+        }
+        
       },
       // hide mdlayout-aside
       hideMdlayoutMasterList(){
@@ -107,6 +117,20 @@
           $(".mdlayout-aside").css("left",0);
           $(".mdlayout-aside .ifbp-footer").css("left",0);
           $(".mdlayout-main").css("margin-left",this.asideWidth);
+        }
+      },
+      //
+      toggleLeft(){
+        // let winW=$(window).width()
+        let mdlayoutAside=$(".mdlayout-aside");
+        let mdlayoutMain=$(".mdlayout-main");
+        if(mdlayoutAside && mdlayoutMain && mdlayoutAside<0){
+            mdlayoutAside.css("left","0");
+            mdlayoutMain.css("margin-left",this.asideWidth);
+        }else{
+            mdlayoutAside.css("left",this.asideWidth*(-1));
+            mdlayoutMain.css("margin-left",0);
+            $(".mdlayout-page .mdlayout-header-func .header-icon").css("display","block");
         }
       },
       requestListData(itemId,fn){
@@ -198,6 +222,10 @@
   }
   .mdlayout-page{
     padding:0 !important;
+  }
+  .header-title .toggle-icon{
+    float:right;
+    cursor:pointer;
   }
 
   @media (max-width: 768px) {

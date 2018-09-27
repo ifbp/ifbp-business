@@ -68,6 +68,6 @@
         top:0;
         transform: translate3d(0px, 0px, 0px);
         box-shadow:rgb(191, 191, 191) -1px -1px 10px;
-        z-index:1;
+        z-index:2;
     }
 </style>

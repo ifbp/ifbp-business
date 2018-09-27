@@ -2,7 +2,7 @@
     <div class="mdlayout-page" @click="hideMdlayoutMasterList">
         <div class="mdlayout-page-header">
             <div class="mdlayout-header-func" v-if="showExpandbtn">
-                <i class="el-icon-pt-fenlei1 header-icon" @click.stop="showMdlayoutMasterList"></i>
+                <i class="ifbp-icon-format-indent-increase header-icon" @click.stop="showMdlayoutMasterList"></i>
             </div>
             <slot name="title"></slot>
         </div>
@@ -82,9 +82,11 @@
   }
   .mdlayout-page-header {
     height: 3rem;
+    line-height:3rem;
     border-bottom: 1px solid #cccccc;
     /* background: #eff4f9; */
     padding-right:10px;
+    text-align:center;
   }
   .mdlayout-page-header label {
     color: #333;
@@ -108,10 +110,9 @@
     width: 100%;
   }
   .mdlayout-page-header .header-title {
-    line-height: 3rem;
-    font-size: 14px;
-    font-weight: bold;
-    margin-left:2rem
+    font-size: 16px;
+    font-weight:500;
+    vertical-align:middle;
   }
   .mdlayout-page-header .header-btn {
     line-height: 3rem;
@@ -132,22 +133,24 @@
     cursor: pointer;
     font-size: 18px;
     padding: 0 5px;
+
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   .mdlayout-header-func {
-    font-size: 1rem;
-    float: left;
-    line-height:3rem;    
+    font-size: 1rem; 
+    vertical-align:middle;
+    float:left;
+    margin-top:15px;
   }
   .mdlayout-header-func i{
     font-size: 1.2rem;
     display: none;
-    font-weight: bold;
     position: relative;
     transition: .3s all;
+    margin-left:.5rem;
   }
 
   .mdlayout-page-footer {
@@ -199,13 +202,9 @@
     -webkit-transform: translate(-100%, 0);
     transform: translate(-100%, 0);
   }
-
   @media (max-width: 768px) {
-    .mdlayout-page-header .header-title{
-      margin-left:.5rem;
-    }
     .mdlayout-page .mdlayout-header-func{
-      padding-left:.5rem;
+      margin-top:0;
     }
     .mdlayout-page .mdlayout-header-func i {
       display: inline-block !important;
