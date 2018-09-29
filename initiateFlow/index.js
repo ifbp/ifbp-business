@@ -1,1 +1,2 @@
-import initiateFlow from"./initiateFlow.vue";export default initiateFlow;
+import initiateFlow from './initiateFlow.vue';
+export default initiateFlow;

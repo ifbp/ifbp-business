@@ -1,1 +1,8 @@
-export default{addCrossRule:function(e,r,a){e.$pageMgr.addCrossRule(e,r,a)},updateOrg(e,r){e.$pageMgr.updateCrossOrg(r)}};
+export default {
+    addCrossRule: function(page, billtype, pk_org){
+      page.$pageMgr.addCrossRule(page, billtype, pk_org);
+    },
+    updateOrg(page, pk_org) {
+      page.$pageMgr.updateCrossOrg(pk_org);
+    },
+}

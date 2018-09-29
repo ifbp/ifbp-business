@@ -1,1 +1,8 @@
-import MdPage from"../mdlayout/src/mdpage";MdPage.install=function(a){a.component(MdPage.name,MdPage)};export default MdPage;
+import MdPage from '../mdlayout/src/mdpage';
+
+/* istanbul ignore next */
+MdPage.install = function(Vue) {
+  Vue.component(MdPage.name, MdPage);
+};
+
+export default MdPage;

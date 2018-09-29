@@ -1,1 +1,8 @@
-import MdLayout from"./src/mdlayout";MdLayout.install=function(o){o.component(MdLayout.name,MdLayout)};export default MdLayout;
+import MdLayout from './src/mdlayout';
+
+/* istanbul ignore next */
+MdLayout.install = function(Vue) {
+  Vue.component(MdLayout.name, MdLayout);
+};
+
+export default MdLayout;

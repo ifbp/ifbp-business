@@ -1,1 +1,2 @@
-import ifbpPrintPre from"./ifbp-print-pre.vue";export default ifbpPrintPre;
+import ifbpPrintPre from './ifbp-print-pre.vue';
+export default ifbpPrintPre;

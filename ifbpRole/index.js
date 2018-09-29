@@ -1,1 +1,8 @@
-import ifbpRole from"./src/ifbp-role";ifbpRole.install=function(o){o.component(ifbpRole.name,ifbpRole)};export default ifbpRole;
+import ifbpRole from './src/ifbp-role';
+
+/* istanbul ignore next */
+ifbpRole.install = function(Vue) {
+  Vue.component(ifbpRole.name, ifbpRole);
+};
+
+export default ifbpRole;
