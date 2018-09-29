@@ -13,7 +13,8 @@
     "mdchildpage",
     "mdlayout",
     "mdpage",
-    "ifbpRole"
+    "ifbpRole",
+    "gridLayout"
   ],
   "scripts": {},
   "repository": {},
