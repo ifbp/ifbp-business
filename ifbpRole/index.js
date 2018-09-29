@@ -1,0 +1,1 @@
+import ifbpRole from"./src/ifbp-role";ifbpRole.install=function(o){o.component(ifbpRole.name,ifbpRole)};export default ifbpRole;

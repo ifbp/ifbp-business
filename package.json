@@ -12,7 +12,8 @@
     "initiateFlow",
     "mdchildpage",
     "mdlayout",
-    "mdpage"
+    "mdpage",
+    "ifbpRole"
   ],
   "scripts": {},
   "repository": {},
