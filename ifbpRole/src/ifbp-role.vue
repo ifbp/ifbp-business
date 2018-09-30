@@ -94,9 +94,11 @@
 			searchRoleUrl:{
 				type:String,
 				required:true
+			},			
+			copyRoleUrl:{
+				type:String,
+				required:true
 			}
-			
-			
 			
 		},
 		watch:{
@@ -255,13 +257,12 @@
 	        	}
 	        },
 	        copyRole(){
-	        
 	        	var data = [];
 	        	this.selected.forEach(v=>{
 	        		data.push(v.id);
 	        	})
 	        	this.$http({
-	        		url:"/wbalone/roleDesign/copy/" + this.roleId,
+							url:this.copyRoleUrl + this.roleId,
 	        		method:"POST",
 	        		data:data
 	        	}).then(res=>{
