@@ -1,9 +1,10 @@
 <template>
 	<div>
-
 		<el-dialog
+		@update:visible="val => dialogRoleVisible = val"
 		title = "选择角色"
-		:visible="dialogRoleVisible"		
+		:visible="dialogRoleVisible"
+		custom-class = "roledialog"
 		>
 
 		   <ifbp-search
@@ -255,7 +256,7 @@
 	        	}else{
 	        		this.copyRole();
 	        	}
-	        },
+					},
 	        copyRole(){
 	        	var data = [];
 	        	this.selected.forEach(v=>{
@@ -287,6 +288,9 @@
 </script>
 
 <style >
+.roledialog .el-dialog__body{
+	overflow: auto !important;
+}
 .selected-panel{
     margin-top: 51px;
     border: none;
