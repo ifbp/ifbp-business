@@ -15,14 +15,14 @@
     .vue-grid-layout {
         position: relative;
         transition: height 200ms ease;
-        min-height:1100px;
+        min-height:1540px;
         background-color:#F2F6FA;
     }
     .bgSection{
         display: inline-block;
         position: absolute;
         width: 100px;
-        height: 100px;
+        height: 48px;
         background:#DEE8F2;
     }
 </style>
@@ -57,7 +57,7 @@
             },
             rowHeight: {
                 type: Number,
-                default:100
+                default:48
             },
             maxRows: {
                 type: Number,
@@ -300,8 +300,8 @@
                 var winWidth=document.body.offsetWidth;
                 var margin=this.margin[0];
                 var secWidth=(winWidth-13*10)/12;
-                var secHeight=100;
-                for(var j=0;j<10;j++){
+                var secHeight=48;
+                for(var j=0;j<26;j++){
                     for(var i=0;i<12;i++){
                         let secTop=j*secHeight+(j+1)*margin;
                         let secLeft=i*secWidth+(i+1)*margin;

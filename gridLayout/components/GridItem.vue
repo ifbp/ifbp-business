@@ -636,10 +636,10 @@
                 this.lastY = y;
 
                 if (this.innerX !== pos.x || this.innerY !== pos.y) {
-                    this.$emit("move", this.i, pos.x, pos.y);
+                    this.$emit("move", this, pos.x, pos.y);
                 }
                 if (event.type === "dragend" && (this.previousX !== this.innerX || this.previousY !== this.innerY)) {
-                    this.$emit("moved", this.i, pos.x, pos.y);
+                    this.$emit("moved", this, pos.x, pos.y);
                 }
                 this.eventBus.$emit("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
             },
@@ -814,10 +814,10 @@
                 // this.lastH = y;
 
                 if (this.innerW !== pos.w || this.innerH !== pos.h) {
-                    this.$emit("resize", this.i, pos.h, pos.w, newSize.height, newSize.width);
+                    this.$emit("resize", this, pos.h, pos.w, newSize.height, newSize.width);
                 }
                 if (this.previousW !== pos.w || this.previousH !== pos.h) {
-                    this.$emit("resized", this.i, pos.h, pos.w, newSize.height, newSize.width);
+                    this.$emit("resized", this, pos.h, pos.w, newSize.height, newSize.width);
                     this.eventBus.$emit("resizeEvent", "resizeend", this.i, this.innerX, this.innerY, pos.h, pos.w);
                 }
             },
@@ -825,7 +825,6 @@
                 let pos=this.calcPosition(this.innerX, this.innerY, this.innerW, this.innerH);
                 this.handlePointerPos(pos);
                 
-                // this.$emit("checked",this);
                 var itemArr=this.$parent.$children;
                 if(itemArr.length>0){
                     itemArr.forEach(ele => {
@@ -833,7 +832,8 @@
                     });
                 }
                 this.isChecked=true;
-                // console.log("isChecked:"+this.isChecked);
+                this.$emit("checked",this);
+                
             },
             //处理Item的指针位置;
             handlePointerPos(pos){
