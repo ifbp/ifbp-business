@@ -15,7 +15,7 @@
     .vue-grid-layout {
         position: relative;
         transition: height 200ms ease;
-        min-height:1540px;
+        min-height:1650px;
         background-color:#F2F6FA;
     }
     .bgSection{
@@ -93,6 +93,10 @@
                 type: Array,
                 required: true,
             },
+            chgBackground:{
+                type: Boolean,
+                default:true
+            }
         },
         data: function () {
             return {
@@ -133,7 +137,11 @@
             removeWindowEventListener("resize", this.onWindowResize);
         },
         mounted: function() {
+            //初始化设置背景div;
             this.handleBgDiv();
+            //初始化背景Div的颜色;
+            this.handleBgColor();
+
             this.$nextTick(function () {
                 validateLayout(this.layout);
                 const self = this;
@@ -181,6 +189,9 @@
             },
             isResizable: function() {
                 this.eventBus.$emit("setResizable", this.isResizable);
+            },
+            chgBackground:function(){
+               this.handleBgColor();
             }
         },
         methods: {
@@ -301,14 +312,25 @@
                 var margin=this.margin[0];
                 var secWidth=(winWidth-13*10)/12;
                 var secHeight=48;
-                for(var j=0;j<26;j++){
+                for(var j=0;j<28;j++){
                     for(var i=0;i<12;i++){
                         let secTop=j*secHeight+(j+1)*margin;
                         let secLeft=i*secWidth+(i+1)*margin;
                         gridLayout.insertAdjacentHTML('afterbegin','<div class="bgSection" style="left:'+secLeft+'px;width:'+secWidth+'px;top:'+secTop+'px"></div>');
                     }
                 }
+            },
+            //根据传入值改变是否显示背景颜色;
+            handleBgColor(){
+                var flag=this.chgBackground;
+                if(flag){
+                    $(".vue-grid-layout").css("background","#F2F6FA");
+                    $(".bgSection").css("background","#DEE8F2");
+                }else{
+                    $(".vue-grid-layout,.bgSection").css("background","transparent");
+                }
             }
+
         },
        
     }
