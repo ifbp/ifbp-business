@@ -1275,6 +1275,7 @@ export default {
   //            this.requestPerson();
   //            this.approveState();
   //            this.historyList();
+                this.$emit("afterAction",this.action);
               } else if (response && response.data && response.data.status === false) {
                 this.$message({
                   type: "error",
@@ -1309,6 +1310,7 @@ export default {
                       this.requestHistory();
                       this.requestAction();
                       vm.isAgree=false;
+                      this.$emit("afterAction",this.action);
                   } else if (response && response.data && (response.data.status === false)) {
                       this.$message({
                           type: 'error',
@@ -1356,6 +1358,7 @@ export default {
           //      this.requestPerson();
           //      this.approveState();
           //      this.historyList();
+                  this.$emit("afterAction",this.action);
                 } else if (
                   response &&
                   response.data &&
@@ -1429,6 +1432,7 @@ export default {
     //              this.requestPerson();
     //              this.approveState();
     //              this.historyList();
+                    this.$emit("afterAction",this.action);
                 } else if (
                   response &&
                   response.data &&
@@ -1488,6 +1492,7 @@ export default {
     //      this.requestPerson();
     //      this.approveState();
     //      this.historyList();
+            this.$emit("afterAction",this.action);
           } else if (
             response &&
             response.data &&
@@ -1545,6 +1550,7 @@ export default {
       //      this.requestPerson();
       //      this.approveState();
       //      this.historyList();
+              this.$emit("afterAction",this.action);
             } else if (
               response &&
               response.data &&
@@ -1654,7 +1660,7 @@ export default {
       this.rejectTo = "";
       this.opinion = "";
   //  this.userId = "";
-      this.$emit("afterAction",this.action);
+  //  this.$emit("afterAction",this.action);
     },
     cancel() {
         this.dialogFormVisible = false;
