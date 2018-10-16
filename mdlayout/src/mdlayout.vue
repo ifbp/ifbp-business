@@ -61,9 +61,6 @@
     methods: {
       //处理容器高度;
       handleConHeight(){
-        // 处理ifbp-main的padding;
-        $(".ifbp-main").css("padding-top",0);
-
         let windowH=$(window).height();
         let headerH=$(".header").height();
         let contentH=windowH-headerH;
@@ -141,6 +138,9 @@
 
 </script>
 <style>
+  .no-padding-top{
+    padding-top:0;
+  }
   .mdlayout-wrapper{
     min-height:100%;
     height:auto;
