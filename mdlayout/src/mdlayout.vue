@@ -138,9 +138,6 @@
 
 </script>
 <style>
-  .no-padding-top{
-    padding-top:0;
-  }
   .mdlayout-wrapper{
     min-height:100%;
     height:auto;
@@ -185,16 +182,16 @@
   }
   /* 左侧样式 */
   .aside-title{
-    height:3rem;
-    line-height:3rem;
+    height:47px;
+    line-height:47px;
     font-weight: bold;
     text-indent:1rem;
-    border-bottom:1px solid #cccccc;
+    border-bottom:1px solid #E6E6EB;
   }
   .md-child-header{
-      height: 3rem;
-      line-height:3rem;    
-      border-bottom: 1px solid #cccccc;
+    height: 47px;
+    line-height:47px;    
+    border-bottom: 1px solid #E6E6EB;
   }
   .md-header-func{
       font-size: 1rem;
@@ -212,9 +209,10 @@
       -moz-osx-font-smoothing: grayscale;
   }
   .md-header-title{
-      font-size: 14px;
-      font-weight: bold;
-      margin-left:1rem;
+      font-size: 16px;
+      font-weight: 500;
+      vertical-align: middle;
+      color: #666666;
   }
   .md-child-section{
       width:100%;
@@ -226,6 +224,7 @@
   .header-title .toggle-icon{
     float:right;
     cursor:pointer;
+    color:#75787B;
   }
 
   @media (max-width: 768px) {

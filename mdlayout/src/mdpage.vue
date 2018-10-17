@@ -81,9 +81,9 @@
     margin: 6px auto;
   }
   .mdlayout-page-header {
-    height: 3rem;
-    line-height:3rem;
-    border-bottom: 1px solid #cccccc;
+    height: 47px;
+    line-height:47px;
+    border-bottom: 1px solid #E6E6EB;
     /* background: #eff4f9; */
     padding-right:10px;
     text-align:center;
@@ -113,6 +113,7 @@
     font-size: 16px;
     font-weight:500;
     vertical-align:middle;
+    color:#666666;
   }
   .mdlayout-page-header .header-btn {
     line-height: 3rem;
@@ -151,6 +152,7 @@
     position: relative;
     transition: .3s all;
     margin-left:.5rem;
+    color:#75787B;
   }
 
   .mdlayout-page-footer {
