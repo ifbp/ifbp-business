@@ -1,5 +1,5 @@
 <template>
-    <div class="mdlayout-wrapper">
+    <div class="mdlayout-wrapper" :class="this.containerClass">
         <div class="mdlayout-aside">
             <slot name="master"></slot>               
         </div>
@@ -23,6 +23,9 @@
       asideWidth:{
         type:Number,
         default:280
+      },
+      containerClass:{
+        type:Array
       }
     },
     created(){

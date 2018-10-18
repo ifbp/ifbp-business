@@ -1,5 +1,5 @@
 <template>
-    <div class="md-child-page">
+    <div class="md-child-page" :class="this.containerClass">
        <slot></slot>
     </div>
 </template>
@@ -22,6 +22,9 @@
         fullscreen:{
             type:Boolean,
             default:false
+        },
+        containerClass:{
+            type:Array
         }
     },
     data(){

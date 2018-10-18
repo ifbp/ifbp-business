@@ -1,5 +1,5 @@
 <template>
-    <div class="mdlayout-page" @click="hideMdlayoutMasterList">
+    <div class="mdlayout-page" @click="hideMdlayoutMasterList" :class="this.containerClass">
         <div class="mdlayout-page-header">
             <div class="mdlayout-header-func" v-if="showExpandbtn">
                 <i class="ifbp-icon-format-indent-increase header-icon" @click.stop="showMdlayoutMasterList"></i>
@@ -25,6 +25,9 @@
         showExpandbtn:{
           type:Boolean,
           default:false
+        },
+        containerClass:{
+          type:Array
         }
     },
     data(){
