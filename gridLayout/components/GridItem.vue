@@ -155,8 +155,8 @@
     import {getDocumentDir} from "../helpers/DOM";
     //    var eventBus = require('./eventBus');
     //用于改变Div形状的插件;
-    let interact = require("interactjs/index.js");
-
+    // let interact = require("interactjs/index.js");
+    import  {} from "../helpers/interact";
     export default {
         name: "GridItem",
         props: {
