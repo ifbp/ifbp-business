@@ -75,11 +75,11 @@
         user-select: none;
     }
     .vue-grid-item:not(.vue-grid-placeholder) {
-        background: #fff;
+        background: #ffffee;
     }
     .vue-grid-item.grid-item-checked{
-        background:#fffff0;
-        border:1px dashed #cccccc;
+        background:#ffffcc;
+        border:1px dashed #dddddd;
 
     }
     .vue-grid-item > .vue-resizable-handle {

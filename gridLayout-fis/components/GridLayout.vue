@@ -15,11 +15,11 @@
 <style>
     .vue-grid-layout1 {
         position: relative;
-        background-color:#F2F6FA;
     }
     .vue-grid-gb-wrap{
         transition: height 200ms ease;
         position: absolute;
+        background-color:transparent;
     }
 </style>
 <script>
