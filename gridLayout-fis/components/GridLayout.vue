@@ -1,5 +1,6 @@
 <template>
-    <div ref="item" id="vueGridLayout" class="vue-grid-layout" :style="mergedStyle">
+    <div ref="item" id="vueGridLayout" class="vue-grid-layout1" :style="mergedStyle">
+        <div id="vueGridBgWrap" class="vue-grid-gb-wrap" v-show="currentBgSvg"></div>
         <slot></slot>
         <grid-item class="vue-grid-placeholder"
                    v-show="isDragging"
@@ -12,24 +13,19 @@
     </div>
 </template>
 <style>
-    .vue-grid-layout {
+    .vue-grid-layout1 {
         position: relative;
-        transition: height 200ms ease;
-        min-height:1650px;
         background-color:#F2F6FA;
     }
-    .bgSection{
-        display: inline-block;
+    .vue-grid-gb-wrap{
+        transition: height 200ms ease;
         position: absolute;
-        width: 100px;
-        height: 48px;
-        background:#DEE8F2;
     }
 </style>
 <script>
     import Vue from 'vue';
     var elementResizeDetectorMaker = require("element-resize-detector");
-
+    // import {} from "../helpers/element-resize-detector";
     import {bottom, compact, getLayoutItem, moveElement, validateLayout} from '../helpers/utils';
     //var eventBus = require('./eventBus');
     import GridItem from './GridItem.vue'
@@ -66,7 +62,7 @@
             margin: {
                 type: Array,
                 default: function () {
-                    return [10, 10];
+                    return [12, 12];
                 }
             },
             isDraggable: {
@@ -93,9 +89,15 @@
                 type: Array,
                 required: true,
             },
-            chgBackground:{
-                type: Boolean,
-                default:true
+            isBgSvg:{
+                type:Boolean,
+                default:true,
+                required:false,
+            },
+            isEditable:{
+                type:Boolean,
+                default:true,
+                required:false
             }
         },
         data: function () {
@@ -111,6 +113,8 @@
                     h: 0,
                     i: -1
                 },
+                currentBgSvg:true,
+                bgRows:20,
             };
         },
         created () {
@@ -137,11 +141,12 @@
             removeWindowEventListener("resize", this.onWindowResize);
         },
         mounted: function() {
-            //初始化设置背景div;
-            this.handleBgDiv();
-            //初始化背景Div的颜色;
-            this.handleBgColor();
-
+            this.handleBackGround(this.bgRows);
+            // 初始化监听滚动条事件，防抖的处理100ms执行一次;
+            var mainRight=document.getElementById("main-right");
+            mainRight.onscroll=()=>{
+                this.debounceFun(this.onWindowScroll(),100);
+            }
             this.$nextTick(function () {
                 validateLayout(this.layout);
                 const self = this;
@@ -190,16 +195,22 @@
             isResizable: function() {
                 this.eventBus.$emit("setResizable", this.isResizable);
             },
-            chgBackground:function(){
-               this.handleBgColor();
+            isEditable: function(val) {
+                // this.eventBus.$emit("setDraggable", this.isEditable);
+                // this.eventBus.$emit("setResizable", this.isEditable);
+                this.eventBus.$emit("setEditable",this.isEditable);
+                this.currentBgSvg=val
+            },
+            isBgSvg:function(val){
+                this.currentBgSvg=val;
             }
+
+
         },
         methods: {
             onWindowLoad: function(){
                 const self = this;
-
                 if (self.width === null) {
-                    self.onWindowResize();
                     //self.width = self.$el.offsetWidth;
                     addWindowEventListener('resize', self.onWindowResize);
                 }
@@ -232,7 +243,7 @@
                 };
             },
             onWindowResize: function () {
-                this.handleBgDiv()
+                this.handleBackGround(this.bgRows);
                 if (this.$refs !== null && this.$refs.item !== null && this.$refs.item !== undefined) {
                     this.width = this.$refs.item.offsetWidth;
                 }
@@ -304,33 +315,67 @@
                 this.updateHeight();
                 if (eventName === 'resizeend') this.$emit('layout-updated', this.layout);
             },
-             //初始化设置背景Div;
-            handleBgDiv(){
-                // debugger;
-                var gridLayout=document.getElementById("vueGridLayout");
-                var winWidth=document.body.offsetWidth;
-                var margin=this.margin[0];
-                var secWidth=(winWidth-13*10)/12;
-                var secHeight=48;
-                for(var j=0;j<28;j++){
-                    for(var i=0;i<12;i++){
-                        let secTop=j*secHeight+(j+1)*margin;
-                        let secLeft=i*secWidth+(i+1)*margin;
-                        gridLayout.insertAdjacentHTML('afterbegin','<div class="bgSection" style="left:'+secLeft+'px;width:'+secWidth+'px;top:'+secTop+'px"></div>');
-                    }
+             //使用svg设置背景表格;
+            handleBackGround(bgRows){
+                var winW = document.documentElement.clientWidth || document.body.clientWidth;
+				var winH = bgRows*60;
+                    winW = winW - 10;
+                var heightRadius=1/bgRows;
+				var innerRectStr = "";
+				var itemW = (winW - 12 * 12) / 12;
+				var itemH = 48;
+				var itemL = 0;
+				var itemT = 12;
+				var fillColor = "hsl(210, 44%, 91%)";
+				for(var i = 0; i < 12; i++) {
+					itemL = 12 + (itemW + 12) * i;
+					innerRectStr += '<rect x=' + itemL + ' y=' + itemT + ' width=' + itemW + ' height=' + itemH + ' fill="' + fillColor + '"></rect>';
+				}
+
+				var svgStr = "";
+				svgStr += '<svg width=' + winW + ' height=' + winH + ' xmlns="http://www.w3.org/2000/svg" version="1.1">';
+				svgStr += '<defs>';
+				svgStr += '<pattern id="pattern" x=0 y=0 width=1 height='+heightRadius+'>';
+				svgStr += innerRectStr;
+				svgStr += '</pattern>';
+				svgStr += '</defs>';
+				svgStr += '<rect fill="url(#pattern)" x=0 y=0 width=' + winW + ' height=' + winH + '></rect>'
+				svgStr += '</svg>';
+
+                var vueGridBgWrap=document.getElementById("vueGridBgWrap");
+                vueGridBgWrap.innerHTML = svgStr;
+                //
+                // var vueGridLayout=document.getElementById("vueGridLayout");
+                // vueGridLayout.style.minHeight = this.bgRows*60+"px" || 0;
+            },
+            //监听滚动条事件;
+            onWindowScroll:function(){
+                var mainRight=document.getElementById("main-right");
+                var curTop = mainRight.scrollTop;             //当前高度;
+                var scrollHeight=mainRight.scrollHeight;   //滚动条长度; 
+                var clientHeight = document.documentElement.clientHeight || document.body.clientHeight; //窗口高度
+                var maxTop = scrollHeight - clientHeight; //最大可滚动高度;
+                var touchTime=curTop/maxTop;
+                if(touchTime>0.95){
+                    this.bgRows+=5;
+                    this.handleBackGround(this.bgRows);
                 }
             },
-            //根据传入值改变是否显示背景颜色;
-            handleBgColor(){
-                var flag=this.chgBackground;
-                if(flag){
-                    $(".vue-grid-layout").css("background","#F2F6FA");
-                    $(".bgSection").css("background","#DEE8F2");
-                }else{
-                    $(".vue-grid-layout,.bgSection").css("background","transparent");
+            //防抖动处理;
+            debounceFun:function(fn, delay) {
+                // 维护一个 timer
+                let timer = null;
+                return function() {
+                    // 通过 ‘this’ 和 ‘arguments’ 获取函数的作用域和变量
+                    let context = this;
+                    let args = arguments;
+
+                    clearTimeout(timer);
+                    timer = setTimeout(function() {
+                    fn.apply(context, args);
+                    }, delay);
                 }
             }
-
         },
        
     }
