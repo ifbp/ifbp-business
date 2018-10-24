@@ -14,7 +14,8 @@
     "mdlayout",
     "mdpage",
     "ifbpRole",
-    "gridLayout"
+    "gridLayout",
+    "gridLayout-fis"
   ],
   "scripts": {},
   "repository": {},
