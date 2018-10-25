@@ -147,6 +147,10 @@
             mainRight.onscroll=()=>{
                 this.debounceFun(this.onWindowScroll(),100);
             }
+
+            this.eventBus.$emit("setEditable",this.isEditable);
+            this.currentBgSvg=this.isEditable;
+
             this.$nextTick(function () {
                 validateLayout(this.layout);
                 const self = this;
