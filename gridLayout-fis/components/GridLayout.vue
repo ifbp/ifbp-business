@@ -335,7 +335,7 @@
 				var itemH = 48;
 				var itemL = 0;
 				var itemT = 12;
-				var fillColor = "hsl(210, 44%, 91%)";
+				var fillColor = "rgba(42,155,227,0.1)";
 				for(var i = 0; i < 12; i++) {
 					itemL = 12 + (itemW + 12) * i;
 					innerRectStr += '<rect x=' + itemL + ' y=' + itemT + ' width=' + itemW + ' height=' + itemH + ' fill="' + fillColor + '"></rect>';

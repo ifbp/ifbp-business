@@ -64,8 +64,8 @@
     }
 
     .vue-grid-item.vue-grid-placeholder {
-        background:green;
-        opacity: 0.2;
+        background:#2A9BE3; 
+        opacity: 0.08;
         transition-duration: 100ms;
         z-index: 2;
         -webkit-user-select: none;
@@ -79,7 +79,8 @@
     }
     .vue-grid-item.grid-item-checked{
         background:#ffffff;
-        border:1px dashed #dddddd;
+        border:1px dashed #2A9BE3;
+
     }
     .vue-grid-item > .vue-resizable-handle {
         position: absolute;
@@ -87,14 +88,17 @@
         height: 10px;
         bottom: -5px;
         right: -5px;
-        border:1px solid #000;
-        background-color:#fff;
+        background: rgba(42,155,227,0.50);
+        border: 1px solid #2A9BE3;
         padding: 0 3px 3px 0;
         background-repeat: no-repeat;
         background-origin: content-box;
         box-sizing: border-box;
         cursor: se-resize;
         z-index:5000;
+    }
+    .vue-grid-item > .vue-resizable-handle:hover{
+        background: rgba(42,155,227,0.75);
     }
     .vue-grid-item > .vue-resizable-handle.sw-icon{
         bottom:-5px;
