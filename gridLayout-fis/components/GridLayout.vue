@@ -365,9 +365,10 @@
                 var clientHeight = document.documentElement.clientHeight || document.body.clientHeight; //窗口高度
                 var maxTop = scrollHeight - clientHeight; //最大可滚动高度;
                 var touchTime=curTop/maxTop;
-                if(touchTime>0.95){
+                if(touchTime>0.95 && this.isEditable){
                     this.bgRows+=5;
                     this.handleBackGround(this.bgRows);
+                    this.handleBgColor(this.bgRows);
                 }
             },
             //防抖动处理;
