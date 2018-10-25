@@ -21,6 +21,9 @@
         position: absolute;
         background-color:transparent;
     }
+    .grid-layout-bg{
+        background-color:#f0f0f5;
+    }
 </style>
 <script>
     import Vue from 'vue';
@@ -150,6 +153,7 @@
 
             this.eventBus.$emit("setEditable",this.isEditable);
             this.currentBgSvg=this.isEditable;
+            this.handleBgColor(this.isEditable); 
 
             this.$nextTick(function () {
                 validateLayout(this.layout);
@@ -204,6 +208,7 @@
                 // this.eventBus.$emit("setResizable", this.isEditable);
                 this.eventBus.$emit("setEditable",this.isEditable);
                 this.currentBgSvg=val
+                this.handleBgColor(val);
             },
             isBgSvg:function(val){
                 this.currentBgSvg=val;
@@ -378,6 +383,17 @@
                     timer = setTimeout(function() {
                     fn.apply(context, args);
                     }, delay);
+                }
+            },
+            handleBgColor:function(isEdit){
+                var vueGridLayout=document.getElementById("vueGridLayout");
+                var bgRows=this.bgRows;
+                if(isEdit){
+                    vueGridLayout.style.minHeight=bgRows*60+"px";
+                    vueGridLayout.setAttribute("class","grid-layout-bg");
+                }else{
+                    vueGridLayout.style.minHeight="0px";
+                    vueGridLayout.className = "vue-grid-layout1";
                 }
             }
         },
