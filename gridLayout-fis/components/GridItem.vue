@@ -325,6 +325,11 @@
             };
             self.setEditable=(editable)=>{
                 self.isEditable=editable;
+                if(editable){
+                    self.$el.style.backgroundColor="#ffffff";
+                }else{
+                    self.$el.style.backgroundColor="rgba(0,0,0,0)";
+                }
             }
 
             this.eventBus.$on('updateWidth', self.updateWidthHandler);

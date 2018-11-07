@@ -111,12 +111,11 @@
   }
   .mdlayout-page-section {
     background: #fff;
-    padding: 0px;
+    padding: 0!important;
     left:0px;
     position: absolute;
     overflow-x: hidden;
     overflow-y: auto;
-    overflow-scrolling: touch;
     -webkit-overflow-scrolling:touch;
     width: 100%;
   }
