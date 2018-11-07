@@ -19,6 +19,7 @@
 </template>
 
 <script>
+  import {scrollBar} from "../helper/jquery.scrollbar.js";
   export default {
     name: 'MdPage',
     props:{
@@ -37,7 +38,14 @@
     created(){
     },
     mounted(){
-       this.handlPageSectionHeight()
+      if(window.isIE){
+        //在IE下,初始化 scrollBar 插件;
+        scrollBar(jQuery);
+        $(".mdlayout-page-section").scrollBar({
+          barWidth:5
+        });
+      };
+      this.handlPageSectionHeight();
     },
     methods: {
       hideMdlayoutMasterList(){

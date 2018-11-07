@@ -229,10 +229,43 @@
     cursor:pointer;
     color:#75787B;
   }
-
+  .mdlayout-wrapper .ifbp-footer{
+    position:absolute;
+  }
   @media (max-width: 768px) {
     .mdlayout-aside .ifbp-footer{
       transition: transform 0.3s ease-in-out, left 0.3s ease-in-out;
     }
+  }
+  .zl-scrollBarBox{
+      height:100%;
+      position:absolute;
+      background:#f3f3f3;
+  }
+  .zl-scrollBar{
+      position:absolute;
+      left:0;
+      top:0;
+      background:#848484;
+      transition:background 0.3s;
+  }
+  .zl-scrollBar.zl-verticalBar{
+      min-height:10px;
+  }
+
+  .zl-scrollBar.zl-horizontalBar{
+      min-width:10px;
+  }
+  .zl-scrollBar:hover{
+      background:#000;
+  }
+  .zl-scrollContentDiv{
+      position:relative !important;
+      width:100% !important;
+      height:100% !important;
+      padding:0 !important;
+      margin:0 !important;
+      top:0;
+      left:0;
   }
 </style>
