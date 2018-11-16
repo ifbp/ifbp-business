@@ -4,7 +4,7 @@
       <!-- 流程步骤 -->
         <div class="step fl">
           <div style="position: relative;">
-            <el-steps :space="286" :active="3">
+            <el-steps :space="236" :active="3">
               <!-- 第一步 -->
               <el-step v-if='listData.length > 0' class="first-step">
                   <div slot="title">
@@ -283,7 +283,7 @@
           </div>
         </div>  
       <!-- 按钮 -->
-      <div class="fr" v-if="this.params.showBtn != false || this.params.showBtn == undefined" style="margin-top:36px;margin-left:2px;">
+      <div class="fr" v-if="this.params.showBtn != false || this.params.showBtn == undefined" style="margin-top:36px;margin-left:2px;margin-right:30px">
         <!-- 待办任务不能有撤回按钮 -->
         <!-- <ul class="btnLists" v-if="this.params.stateFlage != 'his' && !isEnd && isAgree"> -->
         <ul class="btnLists">
@@ -675,6 +675,11 @@ export default {
         this.personList = curList;
       });
     },
+    
+    refreshWidget(){
+      window.vueInstance.$children[0].$eventBus.$emit('refreshevent');
+    },
+
     requestAction() {
       var vm = this;
       vm.$http({
@@ -693,7 +698,8 @@ export default {
           rejectAble: 4,
           assignAble: 5,
           delegateAble: 6,
-          addsignAble: 7
+          addsignAble: 7,
+          recallAble:8
         };
         var curList = [];
         curArr.forEach(action => {
@@ -716,7 +722,7 @@ export default {
         vm.consentBtn = [];
         vm.hiddenBtn = [];
         curList.forEach((item,index)=>{
-          if(item.key == "agreeAble" || item.key == "rejectAble" || item.key == "refuseAble"){
+          if(item.key == "agreeAble" || item.key == "rejectAble"){
             if(item.key == "agreeAble"){
               vm.consentBtn.push(item);
             }else{
@@ -726,9 +732,15 @@ export default {
             temporary.push(item);
           }
         });
+        var len = vm.consentBtn.length + vm.defaultBtn.length;
         temporary.forEach(item=>{
           if(item.key != "assignAble"){
-            vm.hiddenBtn.push(item);
+            if(len >= 2){
+              vm.hiddenBtn.push(item);
+            }else{
+              vm.defaultBtn.push(item);
+              len++;
+            }
           }
         });
       });
@@ -890,7 +902,7 @@ export default {
                           if(vm.waitApproves.length && vm.waitApproves.length >= 1){
                             user =  item.check_userName;  
                           }else{
-                            user = "[处理人] " + item.check_userName;  
+                            user = "[" + item.activeName + "] " + item.check_userName;  
                           }                     
 	                        vm.waitApproves.push(user);
 	                      } else if (deleteReason == "审批后撤回") {
@@ -1275,7 +1287,8 @@ export default {
   //            this.requestPerson();
   //            this.approveState();
   //            this.historyList();
-                this.$emit("afterAction",this.action);
+  		          this.$emit("afterAction",this.action);
+                this.refreshWidget();
               } else if (response && response.data && response.data.status === false) {
                 this.$message({
                   type: "error",
@@ -1310,7 +1323,7 @@ export default {
                       this.requestHistory();
                       this.requestAction();
                       vm.isAgree=false;
-                      this.$emit("afterAction",this.action);
+		                  this.$emit("afterAction",this.action);
                   } else if (response && response.data && (response.data.status === false)) {
                       this.$message({
                           type: 'error',
@@ -1358,7 +1371,8 @@ export default {
           //      this.requestPerson();
           //      this.approveState();
           //      this.historyList();
-                  this.$emit("afterAction",this.action);
+	                this.$emit("afterAction",this.action);
+                  this.refreshWidget();
                 } else if (
                   response &&
                   response.data &&
@@ -1433,6 +1447,7 @@ export default {
     //              this.approveState();
     //              this.historyList();
                     this.$emit("afterAction",this.action);
+                    this.refreshWidget();
                 } else if (
                   response &&
                   response.data &&
@@ -1493,6 +1508,7 @@ export default {
     //      this.approveState();
     //      this.historyList();
             this.$emit("afterAction",this.action);
+            this.refreshWidget();
           } else if (
             response &&
             response.data &&
@@ -1551,6 +1567,7 @@ export default {
       //      this.approveState();
       //      this.historyList();
               this.$emit("afterAction",this.action);
+              this.refreshWidget();
             } else if (
               response &&
               response.data &&
@@ -1660,7 +1677,7 @@ export default {
       this.rejectTo = "";
       this.opinion = "";
   //  this.userId = "";
-  //  this.$emit("afterAction",this.action);
+//      this.$emit("afterAction",this.action);
     },
     cancel() {
         this.dialogFormVisible = false;
@@ -1829,12 +1846,12 @@ export default {
     position: relative;
     /* height: 104px; */
     margin-top: 28px;
-    margin-left: 34px;
+    margin-left: 30px;
   }
 
   .waitAction {
     position: absolute;
-    left: 65px;
+    left: 60px;
     top: 16px;
     font-size: 14px;
     color: #333333;
@@ -1843,7 +1860,7 @@ export default {
   }
   .waitAction span {
   color: #5CB0E6;
-  width:130px;
+  width:120px;
   display:inline-block;
   text-overflow : ellipsis;
   white-space : nowrap;

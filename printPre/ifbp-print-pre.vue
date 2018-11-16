@@ -9,7 +9,7 @@
         popper-class="print-popover"
         >
             <ul>
-                <li v-for="(item,index) in printTemplateArray" :key="item" v-if="printTemplateArray&&printTemplateArray.length>0" @click="printSelect(index)">{{printTemplateMap[item]}}</li>
+                <li v-for="(item,index) in printTemplateArray" :key="item" v-if="printTemplateArray&&printTemplateArray.length>0" @click="printSelect(item)">{{printTemplateMap[item]}}</li>
             </ul>
         </el-popover>
         <el-button v-popover:printPopover @click="printPreFn" :disabled="disabled" v-if="show">{{buttonName}}</el-button>
@@ -53,7 +53,8 @@
             printDropdownDisabled:true,
             printTemplateMap:{},
             printTemplateArray:[],
-            resultMap:{}
+            resultMap:{},
+            localUrl:{}
         };
     },
     methods: {
@@ -62,7 +63,7 @@
                 this.printDropdownDisabled=false;
                 return;
             }else if(this.printTemplateArray.length==1){
-                let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.data.localUrl+'&params='+this.data.param+'&sendType=2';
+                let printUrl = this.localUrl[this.this.printTemplateArray[0]];
                 window.open(printUrl, '_blank');
                 return;
             }
@@ -79,19 +80,16 @@
                 if (res.data.status||res.data.success) {
                     this.resultMap = res.data.data;
                     this.printTemplateMap = this.resultMap.templateIDMap;
+                    this.localUrl = this.resultMap.localUrl;
                     this.printTemplateArray = Object.keys(this.printTemplateMap);
                     if(this.printTemplateArray.length==0){
                         this.$message.error('没有找到有效的打印模板');
                         return;
                     }
-                    if(this.resultMap.param==null||this.resultMap.param==''){
-                        this.$message.error('查询打印数据时没有指定有效参数');
-                        return;
-                    }
                     if(this.printTemplateArray.length>1){
                         this.printDropdownDisabled=false;
                     }else if(this.printTemplateArray.length==1){
-                        let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.resultMap.localUrl+'&params='+this.resultMap.param+'&sendType=2';
+                        let printUrl = this.localUrl[this.this.printTemplateArray[0]];
                         window.open(printUrl, '_blank');
                     }
                 } else {
@@ -102,8 +100,8 @@
                 this.$message.error('操作失败');
             });
         },
-        printSelect(index){
-            let printUrl = '/ifbp-print/rest/template/preview?template='+this.resultMap.templateID+'&printcode='+this.resultMap.templateID+'&funcode='+this.funcode+'&serverUrl='+this.resultMap.localUrl+'&params='+this.resultMap.param+'&sendType=2';
+        printSelect(item){
+            let printUrl = this.localUrl[item];
             window.open(printUrl, '_blank');
         }
     },
