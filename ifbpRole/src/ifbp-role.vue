@@ -144,17 +144,15 @@
 		              sel.push(v.id);
 		            }
 		         });
-
-	        	this.$refs.templateTable.getTableData().forEach((v) => {
-	        		if (v.id && sel.indexOf(v.id) !== -1) {
-	                  this.$refs.templateTable.getTableComp().toggleRowSelection(v, true);
-	                  
-	                } else {
-	                  this.$refs.templateTable.getTableComp().toggleRowSelection(v, false);
-	                }
-	        	})
-
-	        	
+						if(this.$refs.templateTable){
+							this.$refs.templateTable.getTableData().forEach((v) => {
+								if (v.id && sel.indexOf(v.id) !== -1) {
+											this.$refs.templateTable.getTableComp().toggleRowSelection(v, true);
+										} else {
+											this.$refs.templateTable.getTableComp().toggleRowSelection(v, false);
+										}
+							})
+						}	
 	        },
 			handleSelect(searchData){
 				 if (!searchData) {

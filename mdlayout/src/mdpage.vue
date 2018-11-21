@@ -9,12 +9,14 @@
         <div class="mdlayout-page-section">
             <slot name="content"></slot>
         </div>
-        <ifbp-footer ref="ifpb-footer" v-if="$slots['footer-left'] || $slots.footer">
-            <div slot="left">
+        <div class="mdlayout-page-footer" v-if="$slots['footer-left'] || $slots['footer']">
+           <div class="md-footer-left">
               <slot name="footer-left"></slot>
-            </div>
-            <slot name="footer"></slot>
-        </ifbp-footer>
+           </div>
+           <div class="md-footer-right">
+              <slot name="footer"></slot>
+           </div>
+        </div>
     </div>
 </template>
 
@@ -61,7 +63,7 @@
         let winHeight=$(window).height();
         let headerH=$(".header").height();
         let mdTitleH=$(".mdlayout-page-header").height();
-        let flag=$(this.$el).children(".ifbp-footer").length;
+        let flag=$(this.$el).children(".mdlayout-page-footer").length;
         if(flag){
           mdTitleH+=mdTitleH;
         }
@@ -214,6 +216,18 @@
     -webkit-transform: translate(-100%, 0);
     transform: translate(-100%, 0);
   }
+  .md-footer-left,.md-footer-right{
+     display: inline-block;
+  }
+  .md-footer-left{
+    padding-left:16px;
+  }
+  .md-footer-right{
+    float:right;
+    line-height:inherit;
+    padding-right:16px;
+  }
+  
   @media (max-width: 768px) {
     .mdlayout-page .mdlayout-header-func{
       margin-top:0;
