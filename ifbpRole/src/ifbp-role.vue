@@ -20,6 +20,9 @@
                 :pk-temp="tempalteTablePk"
                 :tpl-data="tempalteTableData"
                 show-type="table"
+                :methods="selectionMethods"
+            	:tpl-reset-fun="selectionResetFun"
+
                 @selection-change = "handleTabSelectChange"
                 
                 
@@ -110,7 +113,25 @@
 			},
 			openDialog(val){
 				this.dialogRoleVisible = val
-			}
+			},
+			selected(curVal,oldVal){
+		
+　　　　　　　　 var sel = [];
+		         curVal.forEach((v) => {
+		            if (v.id) {
+		              sel.push(v.id);
+		            }
+		         });
+
+	        	this.$refs.templateTable.getTableData().forEach((v) => {
+	        		if (v.id && sel.indexOf(v.id) !== -1) {
+	                  this.$refs.templateTable.getTableComp().toggleRowSelection(v, true);
+	                  
+	                } else {
+	                  this.$refs.templateTable.getTableComp().toggleRowSelection(v, false);
+	                }
+	        	})　
+　　　　　　　}
 		},
 		data(){
 			return{
@@ -124,36 +145,34 @@
 		        tempalteTableData:[],
 
                 strFieldName: [],
-                searchData:""
+                searchData:"",
+                selectionMethods:{
+		            getRowKeys:function(row){
+		         
+		                return row.id;
+		            }
+		        },
+		        selectionResetFun: function($node){
+		            var $table = this.getTableDom($node);
+		            $table.attr("v-bind:row-key", "getRowKeys");
+		            var $selection = $table.find('el-table-column[type="selection"]');
+		            $selection.attr("v-bind:reserve-selection" , "true");
+		            return $node[0].outerHTML;
+		        }
+		        
+
 			}
 		},
 		methods:{
 		    removeSelected(tagIndex) {
 	          this.selected.splice(tagIndex, 1);
-	          this.setSelected();
+
 	        },
 	        clearSelected(){
 	          this.selected = [];
-	          this.setSelected();
+
 	        },
-	        setSelected(){
-	        	debugger;
-	        	 var sel = [];
-		         this.selected.forEach((v) => {
-		            if (v.id) {
-		              sel.push(v.id);
-		            }
-		         });
-						if(this.$refs.templateTable){
-							this.$refs.templateTable.getTableData().forEach((v) => {
-								if (v.id && sel.indexOf(v.id) !== -1) {
-											this.$refs.templateTable.getTableComp().toggleRowSelection(v, true);
-										} else {
-											this.$refs.templateTable.getTableComp().toggleRowSelection(v, false);
-										}
-							})
-						}	
-	        },
+
 			handleSelect(searchData){
 				 if (!searchData) {
 		          return;
@@ -213,11 +232,11 @@
 	        			this.$nextTick(() => {
 			              if(this.$refs.templateTable){
 			                this.$refs.templateTable.setTableData(res.data.data.content);
-			                this.setSelected()
-			             
+			         
+
 			              }else {
 			                this.$set(this.tempalteTableData, 'uitemplateTableData', res.data.data.content);
-			                this.setSelected()
+			         
 			              }
 		            });
 	        		}
@@ -225,20 +244,45 @@
 	        		
 	        	})
 	        },
+	        getNewArray(arr){
+        	    var allArr = [];
+	        	for(var i=0;i<arr.length;i++){
+			　　var flag = true;
+			　　for(var j=0;j<allArr.length;j++){
+			　　　　if(arr[i].id == allArr[j].id){
+			　　　　　　flag = false;
+			　　　　};
+			　　}; 
+			　　if(flag){
+			　　　　allArr.push(arr[i]);
+			　　};
+			};
+               return allArr
+	
+	       },
+
 	         handleTabSelectChange(selection) {	 
-                 
-	            var table = [];
-	            var cur = [];
-	            this.$refs.templateTable.getTableData().forEach((v) => {
-	              table.push(v.id);
-	            });
-	            this.selected.forEach((v) => {
-	              if (table.indexOf(v.id) < 0) {
-	                cur.push(v);
-	              }
-	            });
-	            this.selected = cur.concat(selection);
 	    
+                this.selected = selection;
+      
+                
+                
+                 var sel = [];
+		         this.selected.forEach((v) => {
+		            if (v.id) {
+		              sel.push(v.id);
+		            }
+		         });
+
+	        	this.$refs.templateTable.getTableData().forEach((v) => {
+	        		if (v.id && sel.indexOf(v.id) !== -1) {
+	                  this.$refs.templateTable.getTableComp().toggleRowSelection(v, true);
+	                  
+	                } else {
+	                  this.$refs.templateTable.getTableComp().toggleRowSelection(v, false);
+	                }
+	        	})　
+                
 	        },
 	        
 	        selectedPanelCollapse(val) {
@@ -249,6 +293,7 @@
 	          }
 	        },
 	        handleCloseSelf(key){
+	        	this.selected = [];
 	        	if(key == 'cancel'){
 	        		this.dialogRoleVisible = false;
 	        	}else{
@@ -261,7 +306,7 @@
 	        		data.push(v.id);
 	        	})
 	        	this.$http({
-							url:this.copyRoleUrl + this.roleId,
+					url:this.copyRoleUrl + this.roleId,
 	        		method:"POST",
 	        		data:data
 	        	}).then(res=>{
