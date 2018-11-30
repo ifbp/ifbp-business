@@ -17,7 +17,8 @@
     "gridLayout",
     "gridLayout-fis",
     "ifbpDomPrint",
-    "ifbpDocumentPreview"
+    "ifbpDocumentPreview",
+    "ifbpBtnLine"
   ],
   "scripts": {},
   "repository": {},
