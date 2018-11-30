@@ -1,11 +1,11 @@
 <template>
     <!-- 新增模板 Dialog -->
     <el-dialog :title='title' :before-close="btnCancel" :visible="showDialog" size="tiny">
-        <el-form ref="assignFormRef" :model="assignFormData" label-width="100px" v-if='optionData.length > 0'>
-            <el-form-item label="环节与指派">
-                <el-input placeholder="请输入内容" v-model="inputVal" :editable="false"></el-input>
+        <el-form ref="assignFormRef" :model="assignFormData" :rules="rules" label-width="100px" v-if='optionData.length > 0'>
+            <el-form-item label="下一环节">
+                <el-input  v-model="inputVal" :editable="false"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item label="指派" required prop="designate">
                 <el-select v-model="assignFormData.designate" multiple placeholder="请选择">
                     <el-option
                         v-for="item in optionData"
@@ -44,11 +44,17 @@
     data(){
         return{
             showDialog:false,
+            designateList:[],
             assignFormData:{
                 designate:[]
             },
             optionData:[],
-            inputVal:''
+            inputVal:'',
+            rules: {
+                designate: [
+                    { required: true, message: '请选择指派人', trigger: 'blur' },
+                ]
+            }
         }
     },
     methods: {
@@ -60,6 +66,7 @@
             });
         },
         request(){
+            debugger;
             var vm = this;
             let requestUrl = '/riart/fbpworkflows/assignsubmit';
             vm.$http({
@@ -70,15 +77,23 @@
                 billId: vm.billId
             },
             dataType: 'json'
-            }).then((res) => {
-                debugger;
-                if (res.data.status === true) {
-                    if(res.data.data){
-                        let getData = res.data.data;
+            }).then(function(res){
+                if (res.data.status === true){
+                    vm.designateList = [];
+                    let getData = res.data.data;
+                    vm.designateList = getData;
+                    if(vm.designateList && vm.designateList.length > 0 ){
                         vm.inputVal = getData[0].activityDesc;
                         vm.optionData = getData[0].allUsers;
+                        if(vm.optionData&&vm.optionData.length>0){
+                            vm.showDialog=true;
+                        }else{
+                            vm.btnConfirm();
+                        }
+                    }else{
+                        vm.btnConfirm();
                     }
-                    vm.showDialog=true;
+   
                 } else {
                     vm.$message.error(res.data.msg);
                 }
@@ -88,32 +103,66 @@
         },
         btnConfirm(){
             debugger;
-            let requestUrl = '/riart/fbpworkflows/dosubmit';
-            this.$http({
-            url: requestUrl,
-            method: 'post',
-            data: {
-                billType: this.billType,
-                billId: this.billId,
-                param: this.assignFormData.designate
-            },
-            dataType: 'json'
-            }).then((res) => {
-                debugger;
-                if (res.data.status === true) {
-                    this.showDialog=false;
-                    this.$emit("callBack");
-                    this.btnCancel();
-                    this.$message({
-                        message: "提交成功！",
-                        type: "success"
-                    });
-                } else {
-                    this.$message.error(res.data.msg);
-                }
-            }).catch((e) => {
-                this.$message.error('操作异常');
-            });
+            var vm = this;
+            if(vm.designateList){
+                vm.$refs["assignFormRef"].validate(function(valid){
+                    if (valid) {
+                        let requestUrl = '/riart/fbpworkflows/dosubmit';
+                        vm.$http({
+                        url: requestUrl,
+                        method: 'post',
+                        data: {
+                            billType: vm.billType,
+                            billId: vm.billId,
+                            param: vm.assignFormData.designate
+                        },
+                        dataType: 'json'
+                        }).then(function(res) {
+                            if (res.data.status === true) {
+                                vm.showDialog=false;
+                                vm.$emit("callBack");
+                                vm.btnCancel();
+                                vm.$message({
+                                    message: "提交成功！",
+                                    type: "success"
+                                });
+                            } else {
+                                vm.$message.error(res.data.msg);
+                            }
+                        }).catch(function(e) {
+                            vm.$message.error('操作异常');
+                        });
+                    } 
+                });
+            }else{
+                let requestUrl = '/riart/fbpworkflows/dosubmit';
+                vm.$http({
+                url: requestUrl,
+                method: 'post',
+                data: {
+                    billType: vm.billType,
+                    billId: vm.billId,
+                    param: vm.assignFormData.designate
+                },
+                dataType: 'json'
+                }).then(function(res) {
+                    if (res.data.status === true) {
+                        vm.showDialog=false;
+                        vm.$emit("callBack");
+                        vm.btnCancel();
+                        vm.$message({
+                            message: "提交成功！",
+                            type: "success"
+                        });
+                    } else {
+                        vm.$message.error(res.data.msg);
+                    }
+                }).catch(function(e) {
+                    vm.$message.error('操作异常');
+                });
+            }
+            
+            
         },
         btnCancel(){
             this.showDialog=false;

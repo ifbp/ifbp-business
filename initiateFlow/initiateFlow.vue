@@ -365,7 +365,7 @@
               </el-form-item>
             </el-form>
           </template>
-          <template v-else-if="action === 'assignAble'">
+          <!--<template v-else-if="action === 'assignAble'">
             <el-form label-position="left">
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
                 <el-input type="textarea" v-model="opinion" :rows="2" placeholder="指派"></el-input>
@@ -381,7 +381,7 @@
                 </el-select>
               </el-form-item>
             </el-form>
-          </template>
+          </template>-->
           <template v-else-if="action === 'refuseAble'">
             <el-form label-position="left">
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
@@ -391,29 +391,44 @@
           </template>
 
           <template v-else-if="action === 'agreeAble'">
-            <el-form label-position="left">
-              <el-form-item label="环节与指派：" :label-width="formLabelWidth" v-show="designateList.length">
-                <div v-for="item in designateList" :key="item.participants_01">
-                  <p>{{item.activityDesc}}</p>
-                  <el-select v-model="item.participants_01" multiple @change="test" placeholder="请选择">
-                    <el-option
-                      v-for="item_01 in item.allUsers"
-                      :label="item_01.name"
-                      :value="item_01.pk_user"
-                      :key="item_01.pk_user">
-                    </el-option>
+            <el-form label-position="left" ref="assignFormRef" :model="assignFormData" :rules="rules">
+              <el-form-item label="下一环节:" :label-width="formLabelWidth" v-show="designateList.length">
+                  <el-input  v-model="inputVal" :editable="false"></el-input>
+              </el-form-item>
+              <el-form-item label="指派:" :label-width="formLabelWidth" required prop="designate">
+                  <el-select v-model="assignFormData.designate" multiple placeholder="请选择">
+                      <el-option
+                        v-for="item in optionData"
+                        :label="item.name"
+                        :value="item.pk_user"
+                        :key="item.pk_user"
+                      >
+                      </el-option>
                   </el-select>
-                </div>
               </el-form-item>
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
                 <el-input type="textarea" v-model="opinion" :rows="2" placeholder="同意"></el-input>
               </el-form-item>
             </el-form>
           </template>
-          <template v-else-if="action === 'addsignAble'||action === 'delegateAble'" class="addsign">
+          <template v-else-if="action === 'addsignAble'" class="addsign">
             <el-form label-position="left">
               <el-form-item label="人员：" :label-width="formLabelWidth">
                 <el-ref :is-muti-select="true"
+                        :ref-code="refcode"
+                        :field="field"
+                        :template-value="refTemplateValue"
+                        width="300px"
+                        :editable="isEdit"
+                        placeholder="请选择">
+		            </el-ref>
+              </el-form-item>
+            </el-form>
+          </template>
+          <template v-else-if="action === 'delegateAble'" class="addsign">
+            <el-form label-position="left">
+              <el-form-item label="人员：" :label-width="formLabelWidth">
+                <el-ref :is-muti-select="false"
                         :ref-code="refcode"
                         :field="field"
                         :template-value="refTemplateValue"
@@ -564,7 +579,17 @@ export default {
         refuseAble: "拒绝",
 	      recallAble:"收回"
       },
-      formLabelWidth: "96px"
+      formLabelWidth: "96px",
+      assignFormData:{
+          designate:[]
+      },
+      inputVal:'',
+      optionData:[],
+      rules: {
+          designate: [
+              { required: true, message: '请选择指派人', trigger: 'blur' },
+          ]
+      }
     };
   },
   computed:{
@@ -590,7 +615,7 @@ export default {
     // 页面刷新事件
     reload(){
       this.approvalComponent = false;
-      this.$nextTick(()=>{
+      this.$nextTick(function(){
         this.approvalComponent = true;
       });
     },
@@ -606,42 +631,42 @@ export default {
       //let url = window.location.hash.substring(1).replace('stateFlage=his','stateFlage=todo');
       var vm = this;
       var params = {
-        taskId: this.params.task_id,
-        processInstanceId: this.params.processInstanceId,
-        processKey: this.params.processKey,
-        businessKey: this.params.businessKey,
-        activityId: this.params.activityId,
+        taskId: vm.params.task_id,
+        processInstanceId: vm.params.processInstanceId,
+        processKey: vm.params.processKey,
+        businessKey: vm.params.businessKey,
+        activityId: vm.params.activityId,
       };
-      this.$http({
+      vm.$http({
         url: "/ifbp-bpm-service/proc/withdraw",
         method: "get",
         params: params
-      }).then(res => {
+      }).then(function(res) {
           if (res.data.success) {
             vm.params.task_id = res.data.map.value.id;
-            this.$message({
+            vm.$message({
               message: "撤回成功！",
               type: "success"
             });
 //            this.$router.push(url);
             vm.isAgree = true;
-            this.requestHistory();
+            vm.requestHistory();
             //让默认按钮和同意按钮清空，重新调接口赋值
-            this.defaultBtn = [];
-            this.consentBtn = [];
-            this.hiddenBtn = [];
-            this.requestAction();
+            vm.defaultBtn = [];
+            vm.consentBtn = [];
+            vm.hiddenBtn = [];
+            vm.requestAction();
           } else {
             vm.$message({
               message: res.data.errorMessage,
               type: "error"
             });
           }
-        this.isHidRevocation = false;
-      }).catch(e => {
-          this.$message.error(e);
+        vm.isHidRevocation = false;
+      }).catch(function(e) {
+          vm.$message.error(e);
       });
-      this.$emit('afterAction','withDraw');
+      vm.$emit('afterAction','withDraw');
     },
     revocation() {
       this.isHidRevocation = true;
@@ -659,20 +684,21 @@ export default {
       window.open(this.flowUrl);
     },
     requestPerson() {
-      this.$http({
+      var vm = this;
+      vm.$http({
         url: "/riart/fbpworkflows/users"
-      }).then(res => {
+      }).then(function(res) {
         var newList = res.data.data;
         // 将取到的值处理一下
         var curList = [];
-        newList.forEach(item => {
+        newList.forEach(function(item) {
           var obj = {
             key: item.name,
             value: item.userid
           };
           curList.push(obj);
         });
-        this.personList = curList;
+        vm.personList = curList;
       });
     },
     
@@ -689,7 +715,7 @@ export default {
           "/" +
           vm.params.billId,
         method: "get"
-      }).then(res => {
+      }).then(function(res) {
         var curArr = res.data.data;
         var btnOrder = {
 	        cancelApprove:1,
@@ -702,7 +728,7 @@ export default {
           recallAble:8
         };
         var curList = [];
-        curArr.forEach(action => {
+        curArr.forEach(function(action) {
           if(action.show){
             if(action.op === 'assignAble'){
               vm.assigntatus = true;
@@ -715,13 +741,13 @@ export default {
               });
             }
         });
-        curList.sort((a, b) => btnOrder[a.key] > btnOrder[b.key]);
+        curList.sort(function(a, b){ btnOrder[a.key] > btnOrder[b.key]});
         vm.btnLists = curList;
         let temporary = [];
         vm.defaultBtn = [];
         vm.consentBtn = [];
         vm.hiddenBtn = [];
-        curList.forEach((item,index)=>{
+        curList.forEach(function(item,index){
           if(item.key == "agreeAble" || item.key == "rejectAble"){
             if(item.key == "agreeAble"){
               vm.consentBtn.push(item);
@@ -733,7 +759,7 @@ export default {
           }
         });
         var len = vm.consentBtn.length + vm.defaultBtn.length;
-        temporary.forEach(item=>{
+        temporary.forEach(function(item){
           if(item.key != "assignAble"){
             if(len >= 2){
               vm.hiddenBtn.push(item);
@@ -748,63 +774,69 @@ export default {
     getAssignment() {
       var vm = this;
       var params = {
-        billType: this.params.billType,
-				billId:this.params.billId
+        billType: vm.params.billType,
+				billId:vm.params.billId
       };
-      this.$http({
+      vm.$http({
         url: "/riart/fbpworkflows/assign-checking",
         method: "get",
         params: params
-      }).then(res => {
+      }).then(function(res) {
           if (res.data.status) {
-            vm.designateList = res.data.data;
-            vm.designateList.forEach(function(item, index) {
-              vm.$set(item, "participants_01", []);
-              item.participants_02 = [];
-            });
+            if(res.data.data){
+                let getData = res.data.data;
+                vm.inputVal = getData[0].activityDesc;
+                vm.optionData = getData[0].allUsers;
+                vm.designateList = getData;
+                vm.designateList.forEach(function(item, index) {
+                  vm.$set(item, "participants_01", []);
+                  item.participants_02 = [];
+                });
+            }
           } else {
             vm.designateList = [];
           }
-        }).catch(() => {
-          this.$message.error("获取被指派人列表失败");
+        }).catch(function() {
+          vm.$message.error("获取被指派人列表失败");
         });
     },
     requestHistory() {
-      this.historyData = [];
       var vm = this;
-      this.$http({
-        url: "/riart/fbpworkflows/approval-detail/"+ this.params.billType +"/"+ this.params.billId,
+      vm.historyData = [];
+      vm.$http({
+        url: "/riart/fbpworkflows/approval-detail/"+ vm.params.billType +"/"+ vm.params.billId,
         method: "get",
         timeout:60000
-      }).then(res => {
+      }).then(function(res) {
         if (res.data.status === true) {	  
            	if(!res.data.data ) {
-	       		  this.$message.error('没有查到审批纪录');
+	       		  vm.$message.error('没有查到审批纪录');
 	    	    }else{	    
 	            vm.historicalRecords = res.data.data.historicTasks;
 	            vm.endActivityId = res.data.data.endActivityId;
 	            // 找到当前环节在审批历史中的位置
-	            vm.historicalRecords.forEach((item,i)=>{
-	              if(item.id == this.$route.query.task_id){
-	                this.indexKey = i;
+	            vm.historicalRecords.forEach(function(item,i){
+	              if(item.id == vm.$route.query.task_id){
+	                vm.indexKey = i;
 	              }
 	            });
 	            // 判断当前环节是不是最后环节
-	            if(vm.historicalRecords.length == this.indexKey){
-	              this.beenProcessed = true;
+	            if(vm.historicalRecords.length == vm.indexKey){
+	              vm.beenProcessed = true;
 	            }else{
-	              //let jointlySign = vm.historicalRecords[this.indexKey].activity.properties.multiinstanceModel;
-	              // 不是最后环节,判断此环节是不是会签
-	              //if( jointlySign == "Sign" || jointlySign == "Sequential"){
-	              //  this.beenProcessed = true;
-	              //}else{
-	              //  if(vm.historicalRecords[this.indexKey].deleteReason != null && (vm.historicalRecords[this.indexKey].deleteReason.indexOf('refuse') != -1 || vm.historicalRecords[this.indexKey].deleteReason.indexOf('reject') != -1)){
-	              //    this.beenProcessed = true;
-	              //  }
-	              // 下一环节处理了,无撤回按钮
-	              //  if(vm.historicalRecords[this.indexKey + 1] && vm.historicalRecords[this.indexKey + 1].deleteReason != null){
-	              //    this.beenProcessed = true;
-	              //  }
+                /**
+	              let jointlySign = vm.historicalRecords[this.indexKey].activity.properties.multiinstanceModel;
+	              不是最后环节,判断此环节是不是会签
+	              if( jointlySign == "Sign" || jointlySign == "Sequential"){
+	               this.beenProcessed = true;
+	              }else{
+	               if(vm.historicalRecords[this.indexKey].deleteReason != null && (vm.historicalRecords[this.indexKey].deleteReason.indexOf('refuse') != -1 || vm.historicalRecords[this.indexKey].deleteReason.indexOf('reject') != -1)){
+	                 this.beenProcessed = true;
+	               }
+	              下一环节处理了,无撤回按钮
+	               if(vm.historicalRecords[this.indexKey + 1] && vm.historicalRecords[this.indexKey + 1].deleteReason != null){
+	                 this.beenProcessed = true;
+	               } */
 	              }
 	            }
 	            vm.listData = [];
@@ -874,16 +906,16 @@ export default {
 	                      }
 
 	                      // 处理历史记录信息
-	                      //var message;
-	                      //if (item.taskComments) {
-	                      //  if (item.taskComments[0]) {
-	                      //    message = item.taskComments[0].message;
-	                      //  } else {
-	                      //    message = " ";
-	                      //  }
-	                      //} else {
-	                      //  message = "";
-	                      //}
+	                      /**var message;
+	                      if (item.taskComments) {
+	                       if (item.taskComments[0]) {
+	                         message = item.taskComments[0].message;
+	                       } else {
+	                         message = " ";
+	                       }
+	                      } else {
+	                       message = "";
+	                      }*/
 	                      // 审批历史记录
 	                      if (deleteReason != "删除" && deleteReason != "待审批" && deleteReason != "审批后撤回") {
 	                        vm.listData.push({
@@ -924,54 +956,56 @@ export default {
 	                      }
                       
 	                      // 审批历史时间处理,按时间排序
-	                      //vm.listData.sort(function(a, b) {
-                          //return (new Date(a.startTime).getTime() - new Date(b.startTime).getTime()); //时间正序
-	                       // return (new Date(a.compareTime).getTime() - new Date(b.compareTime).getTime()); //时间正序
-	                      //});
-	                      // vm.listData.forEach(function(item, index) {
-	                      //   if ( new Date(item.startTime).toLocaleString() != "Invalid Date"){
-	                      //     item.startTime = new Date(item.startTime).toLocaleString();
-	                      //   }
-	                      // }); 
+                        /**
+	                      vm.listData.sort(function(a, b) {
+                          return (new Date(a.startTime).getTime() - new Date(b.startTime).getTime()); //时间正序
+	                       return (new Date(a.compareTime).getTime() - new Date(b.compareTime).getTime()); //时间正序
+	                      });
+	                      vm.listData.forEach(function(item, index) {
+	                        if ( new Date(item.startTime).toLocaleString() != "Invalid Date"){
+	                          item.startTime = new Date(item.startTime).toLocaleString();
+	                        }
+	                      }); 
 
-	                      //vm.historyData.sort(function(a, b) {
-	                       //return (new Date(a.startTime).getTime() - new Date(b.startTime).getTime()); //时间正序
-                         //return (new Date(a.compareTime).getTime() - new Date(b.compareTime).getTime()); //时间正序
-	                     // });             
+	                      vm.historyData.sort(function(a, b) {
+	                       return (new Date(a.startTime).getTime() - new Date(b.startTime).getTime()); //时间正序
+                         return (new Date(a.compareTime).getTime() - new Date(b.compareTime).getTime()); //时间正序
+	                      });  */            
 	                });
 	          } else {
-	            this.$message.error(res.data.msg);
+	            vm.$message.error(res.data.msg);
 	        }
-        }).catch(() => {
-          this.$message.error("审批历史请求失败");
+        }).catch(function() {
+          vm.$message.error("审批历史请求失败");
         });
     },
     // 历史下拉接口
     historyList(){
-      this.historicalApproval = [];
-      this.$http({
+      var vm = this;
+      vm.historicalApproval = [];
+      vm.$http({
         url: '/ifbp-bpm-service/proc/approval-detailExtend',
         method: "post",
         params: {
-          processInstanceId: this.params.processInstanceId,
-          taskId: this.params.task_id
+          processInstanceId: vm.params.processInstanceId,
+          taskId: vm.params.task_id
         }
-      }).then(res=>{
+      }).then(function(res){
         if(res.data.status === true){
           let historyArray = res.data.data.historicTasks;
           let time = res.data.data.startTime;
           // 处理提交环节
-          this.$http({
+          vm.$http({
             url: "/ifbp-bpm-service/identity/info/" + res.data.data.startUserId,
             method: "get"
-          }).then(res_start => {
+          }).then(function(res_start) {
             var userName_start = "";
             if (res_start.data.status === true) {
               userName_start = res_start.data.data.name;
             } else {
               userName_start = "此任务待认领";
             }
-            this.historicalApproval.push({
+            vm.historicalApproval.push({
               message: [{title:"提交",messagenote:''}],
               userName: userName_start,
               activeName: res.data.data.name,
@@ -980,12 +1014,12 @@ export default {
             });
 
             // 处理其他环节
-            historyArray.forEach( item => {
+            historyArray.forEach(function(item) {
               // 查人
-              this.$http({
+              vm.$http({
                 url: "/ifbp-bpm-service/identity/info/" + item.assignee,
                 method: "get"
-              }).then( res_person => {
+              }).then(function(res_person) {
                 let showPerson = '';
                 if(res_person.data.status === 1){
                   showPerson = res_person.data.data.name;
@@ -994,7 +1028,7 @@ export default {
                 // 处理审批信息
                 let messageArray = [];
                 if(item.taskComments && item.taskComments.length > 0){
-                  item.taskComments.forEach( v => {
+                  item.taskComments.forEach(function(v) {
                     // 此处应该用字典
                     if(v.deleteReasonMessage == 'completed'){
                       if(v.message.indexOf('同意') != -1){
@@ -1028,7 +1062,7 @@ export default {
                 if(item.deleteReason == "refuse"){
                   messageArray = ['拒绝'];
                 }
-                this.historicalApproval.push({
+                vm.historicalApproval.push({
                   activeName: item.activity.name,
                   startTime: item.endTime ? item.endTime: item.startTime ? item.startTime : ' ',
                   compareTime: item.endTime ? item.endTime: item.startTime ? item.startTime : ' ',
@@ -1039,686 +1073,736 @@ export default {
 
                 // 权限处理
                 if(item.taskDispearFlag){
-                  messageArray.forEach( value => {
+                  messageArray.forEach(function(value) {
                     value = '*** ***';
                   });
                 }
 
                 // 删除this.historicalApproval中message为空数组的那条数据
-                this.historicalApproval.forEach( ( v, i ) => {
+                vm.historicalApproval.forEach(function( v, i ) {
                   if(v.message.length == 0){
-                    this.historicalApproval.splice( i, 1 );
+                    vm.historicalApproval.splice( i, 1 );
                   }
                 });
 
                 // 按时间排序(正序)
-                this.historicalApproval.sort((a,b) => {
+                vm.historicalApproval.sort(function(a,b) {
                   return (new Date(a.compareTime).getTime() - new Date(b.compareTime).getTime());
                 });
-              }).catch(()=>{
+              }).catch(function(){
               });
               // console.log('this.historicalApproval',this.historicalApproval)
             });
           })
         }else{
-          this.$message.error(res.data.msg);
+          vm.$message.error(res.data.msg);
         }
-      }).catch(()=>{
-          this.$message.error("审批历史请求失败");
+      }).catch(function(){
+          vm.$message.error("审批历史请求失败");
       });
     },
     showList() {
       this.isHiddenList = !this.isHiddenList;
     },
     customEvents(){
-      if (this.action === "agreeAble") {
+      var vm = this;
+      if (vm.action === "agreeAble") {
         //判断btnLists（数组）里面有没有"assignAble"，如果有的话，会出现下拉,掉接口
-        this.getAssignment();
-        this.dialogFormVisible = true;
-      } else if (this.action === "refuseAble") {
-        this.dialogFormVisible = true;
-      } else if (this.action === "rejectAble") {
-        this.$http.get("/riart/fbpworkflows/reject-check", {
+        vm.getAssignment();
+        vm.dialogFormVisible = true;
+      } else if (vm.action === "refuseAble") {
+        vm.dialogFormVisible = true;
+      } else if (vm.action === "rejectAble") {
+        vm.$http.get("/riart/fbpworkflows/reject-check", {
             params: {
-                billType: this.params.billType,
-				        billId:this.params.billId
+                billType: vm.params.billType,
+				        billId:vm.params.billId
             }
-          }).then(response => {
+          }).then(function(response) {
             if (response.data.status === false) {
-              this.$message.error(response.data.msg);
+              vm.$message.error(response.data.msg);
             } else {
               var newList = response.data.data;
               // 将取到的值处理一下
               var curList = [];
 
-              newList.forEach(item => {
+              newList.forEach(function(item) {
                 var obj = {
                   key: item.activityDesc,
                   value: item.activityDefId
                 };
                 curList.push(obj);
               });
-              this.nodeList = curList;
-              this.dialogFormVisible = true;
+              vm.nodeList = curList;
+              vm.dialogFormVisible = true;
             }
-          }).catch(error => {
-			        this.$message.error("获取驳回列表失败！");
+          }).catch(function(error) {
+			        vm.$message.error("获取驳回列表失败！");
           });
 
-      } else if (this.action === "assignAble") {
-        this.getAssignment();
-	      this.dialogFormVisible = true;
-      } else if (this.action === "addsignAble") {
-        this.dialogFormVisible = true;
-      } else if (this.action === "delegateAble") {
-        this.dialogFormVisible = true;
-      }else if (this.action === "cancelApprove") {
-		    this.dialogCancelApprove = true;
-	    }else if (this.action === 'recallAble') {
-        this.isHidRevocation = true;
+      } 
+      /**else if (vm.action === "assignAble") {
+        vm.getAssignment();
+	      vm.dialogFormVisible = true;
+      } */
+      else if (vm.action === "addsignAble") {
+        vm.dialogFormVisible = true;
+      } else if (vm.action === "delegateAble") {
+        vm.dialogFormVisible = true;
+      }else if (vm.action === "cancelApprove") {
+		    vm.dialogCancelApprove = true;
+	    }else if (vm.action === 'recallAble') {
+        vm.isHidRevocation = true;
       }
     },
     clickButton(action) {
-      if(this.params.passValue == true){
-        this.action = action;
-        this.$emit("callBack",action);
-      }else if(this.params.passValue == undefined || this.params.passValue == false){
-        var data = this.params;
-        this.action = action;
-        if (this.action === "agreeAble") {
+      var vm = this;
+      if(vm.params.passValue == true){
+        vm.action = action;
+        vm.$emit("callBack",action);
+      }else if(vm.params.passValue == undefined || vm.params.passValue == false){
+        var data = vm.params;
+        vm.action = action;
+        if (vm.action === "agreeAble") {
           //判断btnLists（数组）里面有没有"assignAble"，如果有的话，会出现下拉,掉接口
-          this.getAssignment();
-          this.dialogFormVisible = true;
-        } else if (this.action === "refuseAble") {
-          this.dialogFormVisible = true;
-        } else if (this.action === "rejectAble") {
-          this.$http.get("/riart/fbpworkflows/reject-check", {
+          vm.getAssignment();
+          vm.dialogFormVisible = true;
+        } else if (vm.action === "refuseAble") {
+          vm.dialogFormVisible = true;
+        } else if (vm.action === "rejectAble") {
+          vm.$http.get("/riart/fbpworkflows/reject-check", {
             params: {
-              	billType: this.params.billType,
-				        billId:this.params.billId
+              	billType: vm.params.billType,
+				        billId:vm.params.billId
             }
-          }).then(response => {
+          }).then(function(response) {
             // 获取驳回下拉列表
             if (response.data.status === false) {
-              this.$message.error(response.data.msg);
+              vm.$message.error(response.data.msg);
             } else {
               var newList = response.data.data;
               // 将取到的值处理一下
               var curList = [];
-              newList.forEach(item => {
+              newList.forEach(function(item) {
                 var obj = {
                   key: item.activityDesc,
                   value: item.activityDefId
                 };
                 curList.push(obj);
               });
-              this.nodeList = curList;
-              this.dialogFormVisible = true;
+              vm.nodeList = curList;
+              vm.dialogFormVisible = true;
             }
-          }).catch(error => {
-			        this.$message.error("获取驳回列表失败！");
+          }).catch(function(error) {
+			        vm.$message.error("获取驳回列表失败！");
           });
-        } else if (this.action === "assignAble") {
-          this.getAssignment();
-	        this.dialogFormVisible = true;
-        } else if (this.action === "addsignAble") {
-			      this.dialogFormVisible = true;
-        } else if (this.action === "delegateAble") {
-			      this.dialogFormVisible = true;
-        } else if (this.action === "cancelApprove") {
-			      this.dialogCancelApprove = true;
-	    	}else if (this.action === 'recallAble') {
-            this.isHidRevocation = true;
+        }
+        /**else if (vm.action === "assignAble") {
+          vm.getAssignment();
+	        vm.dialogFormVisible = true;
+        }*/
+         else if (vm.action === "addsignAble") {
+			      vm.dialogFormVisible = true;
+        } else if (vm.action === "delegateAble") {
+			      vm.dialogFormVisible = true;
+        } else if (vm.action === "cancelApprove") {
+			      vm.dialogCancelApprove = true;
+	    	}else if (vm.action === 'recallAble') {
+            vm.isHidRevocation = true;
         }
       }
     },
     waitApprove() {
-      this.$http({
+      var vm = this;
+      vm.$http({
         url:
           "/riart/fbpworkflows/proc/" +
-          this.params.processInstanceId +
+          vm.params.processInstanceId +
           "/todoActivity",
         method: "get"
-      }).then(res => {
-          this.waitApproves = res.data.data.name;
-        }).catch(() => {
-          this.$message.error("请求失败");
+      }).then(function(res) {
+          vm.waitApproves = res.data.data.name;
+        }).catch(function() {
+          vm.$message.error("请求失败");
         });
     },
 
     getOpinion() {
-      this.$http.get("/ifbp-bpm-service/proc/approval-comments", {
+      var vm = this;
+      vm.$http.get("/ifbp-bpm-service/proc/approval-comments", {
           params: {
-            processInstanceId: this.params.processInstanceId
+            processInstanceId: vm.params.processInstanceId
           }
-        }).then(res => {
+        }).then(function(res) {
 
-        }).catch(error => {
+        }).catch(function(error) {
 
         });
     },
 
     approveState() {
-      this.$http({
+      var vm = this;
+      vm.$http({
         url:
-          "/ifbp-bpm-service/proc/" + this.params.processInstanceId + "/status",
+          "/ifbp-bpm-service/proc/" + vm.params.processInstanceId + "/status",
         method: "get"
-      }).then(res => {
+      }).then(function(res) {
           if (res.data.data.status === "run") {
-            this.isEnd = false;
+            vm.isEnd = false;
           } else {
-            this.isEnd = true;
+            vm.isEnd = true;
           }
-        }).catch(() => {
-          this.$message.error("请求失败");
+        }).catch(function() {
+          vm.$message.error("请求失败");
         });
     },
 
     confirm() {
       var vm = this;
-      this.data = this.curdata;
+      vm.data = vm.curdata;
       var designateListStr = "";      
-  //  let url = window.location.hash.substring(1).replace('stateFlage=todo','stateFlage=his');
-      if (this.action === "agreeAble") {         
-          if(this.designateList.length > 0){  
-            var selectuser = [];  
-            var activityDefId  = "";                 
-            this.designateList.forEach(function(item, index) {
-              activityDefId = item.activityDefId;
-              for (var i = 0; i < item.participants_01.length; i++) {
-                  var itemId = item.participants_01[i];
-                  selectuser.push(itemId)
-                  item.participants_02.push({
-                    id: itemId
-                  });
-                }
+      if (vm.action === "agreeAble") {
+        if(vm.designateList.length > 0){
+          vm.$refs["assignFormRef"].validate(function(valid){
+            debugger;
+                if (valid) {
+                    var selectuser = [];  
+                    var activityDefId  = "";                 
+                    vm.designateList.forEach(function(item, index) {
+                      activityDefId = item.activityDefId;
+                      /**for (var i = 0; i < item.participants_01.length; i++) {
+                          var itemId = item.participants_01[i];
+                          selectuser.push(itemId)
+                          item.participants_02.push({
+                            id: itemId
+                          });
+                        }*/
+                    });
+                    var param_assign_value = {};
+                    param_assign_value[activityDefId] = vm.assignFormData.designate;
+                    if ( vm.opinion === "") {
+                      vm.opinion = "指派";
+                      } 
+                    var obj = {}; 
+                    obj.param_assign_info = param_assign_value;
+                    obj.param_note = vm.opinion;
+                    var em = {};
+                    em.nolockandconsist = "Y";
+                    var param = JSON.stringify(obj);
+                    vm.$http({
+                      url: "/riart/fbpworkflows/doAction",
+                      method: "post",
+                      data: {
+                        action : "agree",
+                        param : param,
+                        billType : vm.params.billType,
+                        billId : vm.params.billId,
+                        agentuserId:vm.params.agentuserId,
+                        pk_checkflow:""
+                      },
+                      timeout:60000
+                    }).then(function(response) {
+                      vm.dialogFormVisible = false;
+                      if (response && response.data && response.data.status === true) {                
+                        vm.$message({
+                          type: "success",
+                          message: "处理成功"
+                        });
+          //            vm.$router.push(url);
+                        vm.requestHistory();
+                        vm.requestAction();
+                        vm.isAgree = false;
+          //            vm.requestPerson();
+          //            vm.approveState();
+          //            vm.historyList();
+                        vm.$emit("afterAction",vm.action);
+                        vm.refreshWidget();
+                      } else if (response && response.data && response.data.status === false) {
+                        vm.$message({
+                          type: "error",
+                          message: response.data.msg
+                        });
+                      }
+                    }).catch(function(error) {
+                      vm.dialogFormVisible = false;
+                    });
+                  } ;
             });
-            // if (!this.designateList.length > 0) {
-            //   designateListStr = "";
-            // } else {
-            //   designateListStr = JSON.stringify(this.designateList);
-            // }
-            var param_assign_value = {};
-            param_assign_value[activityDefId] = selectuser;
-            if ( this.opinion === "") {
-              this.opinion = "指派";
-              } 
-            var obj = {}; 
-            obj.param_assign_info = param_assign_value;
-            obj.param_note = this.opinion;
-            var em = {};
-            em.nolockandconsist = "Y";
-            var param = JSON.stringify(obj);					
-          }else{
+        }else{
             var obj = {};
-            if ( this.opinion === "") {
-              this.opinion = "同意";
+            if ( vm.opinion === "") {
+              vm.opinion = "同意";
             }
-            obj.param_note = this.opinion;
+            obj.param_note = vm.opinion;
             var em = {};
             em.nolockandconsist = "Y";
             obj.eParam = em;
             var param = JSON.stringify(obj);
-                  
-          }
-          this.$http({
+            vm.$http({
               url: "/riart/fbpworkflows/doAction",
               method: "post",
               data: {
                 action : "agree",
                 param : param,
-                billType : this.params.billType,
-                billId : this.params.billId,
-                agentuserId:this.params.agentuserId,
+                billType : vm.params.billType,
+                billId : vm.params.billId,
+                agentuserId:vm.params.agentuserId,
                 pk_checkflow:""
               },
               timeout:60000
-            }).then(response => {
-              this.dialogFormVisible = false;
+            }).then(function(response) {
+              vm.dialogFormVisible = false;
               if (response && response.data && response.data.status === true) {                
-                this.$message({
+                vm.$message({
                   type: "success",
                   message: "处理成功"
                 });
-  //            this.$router.push(url);
-                this.requestHistory();
-                this.requestAction();
+  //            vm.$router.push(url);
+                vm.requestHistory();
+                vm.requestAction();
                 vm.isAgree = false;
-  //            this.requestPerson();
-  //            this.approveState();
-  //            this.historyList();
-  		          this.$emit("afterAction",this.action);
-                this.refreshWidget();
+  //            vm.requestPerson();
+  //            vm.approveState();
+  //            vm.historyList();
+                vm.$emit("afterAction",vm.action);
+                vm.refreshWidget();
               } else if (response && response.data && response.data.status === false) {
-                this.$message({
+                vm.$message({
                   type: "error",
                   message: response.data.msg
                 });
               }
-            }).catch(error => {
-              this.dialogFormVisible = false;
+            }).catch(function(error) {
+              vm.dialogFormVisible = false;
             });
-          } else if (this.action === 'cancelApprove') {
+        };       
+
+      } else if (vm.action === 'cancelApprove') {
               var obj = {};
               obj.param_note = "cancelApprove";
               var param = JSON.stringify(obj);
-              this.$http({
+              vm.$http({
                   url: '/riart/fbpworkflows/doAction',
                   method: 'post',
                   data: {
                       action : 'cancelApprove',
                       param : param,
-                      billType : this.params.billType,
-                      billId : this.params.billId,
-                      agentuserId:this.params.agentuserId,
+                      billType : vm.params.billType,
+                      billId : vm.params.billId,
+                      agentuserId:vm.params.agentuserId,
                       pk_checkflow:''
                   }
-              }).then((response) => {
-                  this.dialogCancelApprove = false;
+              }).then(function(response) {
+                debugger;
+                  vm.dialogCancelApprove = false;
                   if (response && response.data && (response.data.status === true)) {  
-                      this.$message({
+                      vm.$message({
                           type: 'success',
                           message: '取消审批'
                       });
-                      this.requestHistory();
-                      this.requestAction();
+                      vm.requestHistory();
+                      vm.requestAction();
                       vm.isAgree=false;
-		                  this.$emit("afterAction",this.action);
+		                  vm.$emit("afterAction",vm.action);
                   } else if (response && response.data && (response.data.status === false)) {
-                      this.$message({
+                      vm.$message({
                           type: 'error',
                           message: response.data.msg
                       });
                   }
-              }).catch((error) => {
-                  this.dialogCancelApprove = false;
-                  this.$message({
+              }).catch(function(error) {
+                  vm.dialogCancelApprove = false;
+                  vm.$message({
                       type: 'error',
                       message: '请求失败'
                   });
               });
-          }else if (this.action === "refuseAble") {
-              if ( this.opinion === "") {
-                this.opinion = "不同意";
+          }else if (vm.action === "refuseAble") {
+              if ( vm.opinion === "") {
+                vm.opinion = "不同意";
               }
               var obj = {};
-              obj.param_note = this.opinion;
+              obj.param_note = vm.opinion;
               var param = JSON.stringify(obj);
-              this.$http({
+              vm.$http({
                 url: "/riart/fbpworkflows/doAction",
                   method: "post",
                   data: {
                     action : "disagree",
                     param : param,
-                    billType : this.params.billType,
-                    billId : this.params.billId,
-                    agentuserId:this.params.agentuserId,
+                    billType : vm.params.billType,
+                    billId : vm.params.billId,
+                    agentuserId:vm.params.agentuserId,
                     pk_checkflow:""
                   },
                   timeout:60000
-              }).then(response => {
-                this.dialogFormVisible = false;
+              }).then(function(response) {
+                vm.dialogFormVisible = false;
                 if (response && response.data && response.data.status === true) {
-                  this.dialogFormVisible = false;
-                  this.$message({
+                  vm.dialogFormVisible = false;
+                  vm.$message({
                     type: "success",
                     message: "已拒绝"
                   });
-          //      this.$router.push(url);
-                  this.requestHistory();
-                  this.requestAction();
+          //      vm.$router.push(url);
+                  vm.requestHistory();
+                  vm.requestAction();
                   vm.isAgree = false;
-          //      this.requestPerson();
-          //      this.approveState();
-          //      this.historyList();
-	                this.$emit("afterAction",this.action);
-                  this.refreshWidget();
+          //      vm.requestPerson();
+          //      vm.approveState();
+          //      vm.historyList();
+	                vm.$emit("afterAction",vm.action);
+                  vm.refreshWidget();
                 } else if (
                   response &&
                   response.data &&
                   response.data.status === false
                 ) {
-                  this.$message({
+                  vm.$message({
                     type: "error",
                     message: response.data.msg
                   });
                 }
-              }).catch(error => {
-                this.dialogFormVisible = false;
-                this.$message({
+              }).catch(function(error) {
+                vm.dialogFormVisible = false;
+                vm.$message({
                   type: "error",
                   message: "请求失败"
                 });
               });
-        } else if (this.action === "rejectAble") {
-          if ( this.opinion === "") {
-              this.opinion = "驳回";
+        } else if (vm.action === "rejectAble") {
+          if ( vm.opinion === "") {
+              vm.opinion = "驳回";
             }
           // 驳回
           var obj = {};
-          var param_reject_activity = this.rejectTo;
-          obj.param_note = this.opinion;
+          var param_reject_activity = vm.rejectTo;
+          obj.param_note = vm.opinion;
           obj.param_reject_activity = param_reject_activity;
           var param = JSON.stringify(obj);
           var params;
-          if (this.rejectTo === "REJECTTOINIT") {
+          if (vm.rejectTo === "REJECTTOINIT") {
             params = {
               rejectToInit: "true",
               action: "reject",
               param : param,
-              billType : this.params.billType,
-              billId : this.params.billId,
-              agentuserId:this.params.agentuserId,
+              billType : vm.params.billType,
+              billId : vm.params.billId,
+              agentuserId:vm.params.agentuserId,
               pk_checkflow:""
               };
           } else {
             params = {
               action: "reject",
               param : param,
-              billType : this.params.billType,
-              billId : this.params.billId,
-              agentuserId:this.params.agentuserId,
+              billType : vm.params.billType,
+              billId : vm.params.billId,
+              agentuserId:vm.params.agentuserId,
               pk_checkflow:""
             };
-            if (this.rejectTo === "") {
-              this.$message({
+            if (vm.rejectTo === "") {
+              vm.$message({
                 type: "error",
                 message: "请选择有效的节点"
               });
               return;
             }
           }
-          this.$http({
+          vm.$http({
             url: "/riart/fbpworkflows/doAction",
             method: "post",
             data: params
-            }).then(response => {
-                this.dialogFormVisible = false;
+            }).then(function(response) {
+                vm.dialogFormVisible = false;
                 if (response && response.data && response.data.status === true) {
-                  this.$message({
+                  vm.$message({
                     type: "success",
                     message: "驳回成功"
                   });
-    //              this.$router.push(url);
-                    this.requestHistory();
-                    this.requestAction();
+    //              vm.$router.push(url);
+                    vm.requestHistory();
+                    vm.requestAction();
                     vm.isAgree = false;
-    //              this.requestPerson();
-    //              this.approveState();
-    //              this.historyList();
-                    this.$emit("afterAction",this.action);
-                    this.refreshWidget();
+    //              vm.requestPerson();
+    //              vm.approveState();
+    //              vm.historyList();
+                    vm.$emit("afterAction",vm.action);
+                    vm.refreshWidget();
                 } else if (
                   response &&
                   response.data &&
                   response.data.status === false
                 ) {
-                  this.$message({
+                  vm.$message({
                     type: "error",
                     message: response.data.msg
                   });
                 }
-            }).catch(error => {
-              this.dialogFormVisible = false;
-              this.$message({
+            }).catch(function(error) {
+              vm.dialogFormVisible = false;
+              vm.$message({
                   type: "error",
                   message: "请求失败"
               });
             });
-        } else if (this.action === "delegateAble") {
-          var user = this.refTemplateValue;
+        } else if (vm.action === "delegateAble") {
+          var user = vm.refTemplateValue;
           if (user === undefined ) {
-            this.$message({
+            vm.$message({
               type: "error",
               message: "请选择具体改派人"
             });
             return;
           }
-          if ( this.opinion === "") {
-            this.opinion = "改派";
+          if ( vm.opinion === "") {
+            vm.opinion = "改派";
           }
           var obj = {};
           obj.param_reaassign_user = user.refcode;
-          obj.param_note = this.opinion;
+          obj.param_note = vm.opinion;
           var param = JSON.stringify(obj);
-          this.$http({
+          vm.$http({
           url: "/riart/fbpworkflows/doAction",
           method: "post",
           data: {
             action : "reassign",
             param : param,
-            billType : this.params.billType,
-            billId : this.params.billId,
-            agentuserId:this.params.agentuserId,
+            billType : vm.params.billType,
+            billId : vm.params.billId,
+            agentuserId:vm.params.agentuserId,
             pk_checkflow:""
           }
 
-        }).then(response => {
-          this.dialogFormVisible = false;
+        }).then(function(response) {
+          vm.dialogFormVisible = false;
           if (response && response.data && response.data.status === true) {
-            this.$message({
+            vm.$message({
             type: "success",
             message: "改派成功"
             });
-    //      this.$router.push(url);
-            this.requestHistory();
-            this.requestAction();
+    //      vm.$router.push(url);
+            vm.requestHistory();
+            vm.requestAction();
             vm.isAgree = false;
-    //      this.requestPerson();
-    //      this.approveState();
-    //      this.historyList();
-            this.$emit("afterAction",this.action);
-            this.refreshWidget();
+    //      vm.requestPerson();
+    //      vm.approveState();
+    //      vm.historyList();
+            vm.$emit("afterAction",vm.action);
+            vm.refreshWidget();
           } else if (
             response &&
             response.data &&
             response.data.status === false
           ) {
-            this.$message({
+            vm.$message({
               type: "error",
               message: response.data.msg
             });
           }
-          }).catch(error => {
-            this.dialogFormVisible = false;
-            this.$message({
+          }).catch(function(error) {
+            vm.dialogFormVisible = false;
+            vm.$message({
                   type: "error",
                   message: "请求失败"
             });
           });
-      } else if (this.action === "addsignAble") {
-          var users = this.refTemplateValue;
+      } else if (vm.action === "addsignAble") {
+          var users = vm.refTemplateValue;
           if (users === undefined ) {
-            this.$message({
+            vm.$message({
               type: "error",
               message: "请选择具体加签人"
             });
             return;
           }
-          if ( this.opinion === "") {
-            this.opinion = "加签";
+          if ( vm.opinion === "") {
+            vm.opinion = "加签";
           }
           var obj = {};
-          obj.param_note = this.opinion;
+          obj.param_note = vm.opinion;
           obj.param_addApprove =  users.refcode.replace("\"","").split(",");
           var param = JSON.stringify(obj);
-          this.$http({
+          vm.$http({
             url: "/riart/fbpworkflows/doAction",
             method: "post",
             data: {
               action : "addApprove",
               param : param,
-              billType : this.params.billType,
-              billId : this.params.billId,
-              agentuserId:this.params.agentuserId,
+              billType : vm.params.billType,
+              billId : vm.params.billId,
+              agentuserId:vm.params.agentuserId,
               pk_checkflow:""
             }
-          }).then(response => {
-            this.dialogFormVisible = false;
+          }).then(function(response) {
+            vm.dialogFormVisible = false;
             if (response && response.data && response.data.status === true) {
-              this.$message({
+              vm.$message({
                 type: "success",
                 message: "加签成功"
               });
-              this.requestHistory();
-              this.requestAction();
+              vm.requestHistory();
+              vm.requestAction();
               vm.isAgree = false;
       //      this.requestPerson();
       //      this.approveState();
       //      this.historyList();
-              this.$emit("afterAction",this.action);
-              this.refreshWidget();
+              vm.$emit("afterAction",vm.action);
+              vm.refreshWidget();
             } else if (
               response &&
               response.data &&
               response.data.status === false
             ) {
-              this.$message({
+              vm.$message({
                 type: "error",
                 message: response.data.msg
               });
             }
-          }).catch(error => {
-            this.dialogFormVisible = false;
-            this.$message({
+          }).catch(function(error) {
+            vm.dialogFormVisible = false;
+            vm.$message({
               type: "error",
               message: "请求失败"
             });
           });
-        }else if (this.action === "assignAble") {
-          this.nodeList.forEach(function(item, index) {
+        }
+        /**else if (vm.action === "assignAble") {
+          vm.nodeList.forEach(function(item, index) {
             if (item.value == vm.rejectTo) {
             vm.remoteUserId = item.remoteUserId;
             }
           });
-          this.$http({
+          vm.$http({
             url: "/ifbp-bpm-service/approval/action",
             method: "post",
             data: {
-            taskId: this.params.task_id,
+            taskId: vm.params.task_id,
             action: "agree",
-            comment: this.opinion,
-            processInstanceId: this.params.processInstanceId,
-            activityId: this.rejectTo,
+            comment: vm.opinion,
+            processInstanceId: vm.params.processInstanceId,
+            activityId: vm.rejectTo,
             remoteUserId: vm.remoteUserId
             }
-          }).then(response => {
-            this.dialogFormVisible = false;
+          }).then(function(response) {
+            vm.dialogFormVisible = false;
               if (response && response.data && response.data.status === 1) {
-                  this.dialogFormVisible = false;
-                  this.$message({
+                  vm.dialogFormVisible = false;
+                  vm.$message({
                     type: "success",
                     message: "指派成功"
                   });
-      //      this.$router.push(url);
-              this.requestHistory();
-              this.requestAction();
+      //      vm.$router.push(url);
+              vm.requestHistory();
+              vm.requestAction();
               vm.isAgree = false;
-      //      this.requestPerson();
-      //      this.approveState();
-      //      this.historyList();
+      //      vm.requestPerson();
+      //      vm.approveState();
+      //      vm.historyList();
             } else if (
               response &&
               response.data &&
               response.data.status === 0
             ) {
-              this.$message({
+              vm.$message({
                 type: "error",
                 message: response.data.msg
               });
             }
-          }).catch(error => {
-            this.dialogFormVisible = false;
-            this.$message({
+          }).catch(function(error) {
+            vm.dialogFormVisible = false;
+            vm.$message({
                 type: "error",
                 message: "请求失败"
             });
           });
-        }else if(this.action === "recallAble"){
+        }*/
+        else if(vm.action === "recallAble"){
           var obj = {};
           obj.param_note = "recall";
           var param = JSON.stringify(obj);
-          this.$http({
+          vm.$http({
           url: "/riart/fbpworkflows/doAction",
           method: "post",
           data: {
             action : "recall",
             param : param,
-            billType : this.params.billType,
-            billId : this.params.billId,
-            agentuserId:this.params.agentuserId,
+            billType : vm.params.billType,
+            billId : vm.params.billId,
+            agentuserId:vm.params.agentuserId,
             pk_checkflow:""
           }
-        }).then(response => {
-          this.isHidRevocation = false;
+        }).then(function(response) {
+          vm.isHidRevocation = false;
           if (response && response.data && response.data.status === true) {           
-            this.$message({
+            vm.$message({
               type: "success",
               message: "收回成功"
             });
-            this.$nextTick(function(){
-              this.$emit("isRecall",true);
+            vm.$nextTick(function(){
+              vm.$emit("isRecall",true);
             });
             vm.isAgree=true;
           } else if (response && response.data && response.data.status === false) {
-            this.$message({
+            vm.$message({
               type: "error",
               message: response.data.msg
             });
           }
-        }).catch(error => {
-          this.isHidRevocation = false;
-          this.$message({
+        }).catch(function(error) {
+          vm.isHidRevocation = false;
+          vm.$message({
               type: "error",
               message: "请求失败"
           });
         });
       }
-      this.rejectTo = "";
-      this.opinion = "";
+      vm.rejectTo = "";
+      vm.opinion = "";
   //  this.userId = "";
-//      this.$emit("afterAction",this.action);
+  //  this.$emit("afterAction",this.action);
     },
     cancel() {
         this.dialogFormVisible = false;
         this.rejectTo = "";
         this.opinion = "";
-  //      this.userId = "";
+  //    this.userId = "";
       },
 
     isEnable() {
-      var sceneCode = this.params_01.sceneCode;
+      var vm = this;
+      var sceneCode = vm.params_01.sceneCode;
       if (sceneCode !== "undefined" && sceneCode) {
-        this.$http.get("/ifbp-bpm-service/bmp_proc/check", {
+        vm.$http.get("/ifbp-bpm-service/bmp_proc/check", {
             params: {
               buzicode: "KHGL",
               sceneCode: sceneCode
             }
-          }).then(res => {
-            this.isSponsor = res.data.data.enabled;
-          }).catch(error => {
+          }).then(function(res) {
+            vm.isSponsor = res.data.data.enabled;
+          }).catch(function(error) {
 
           });
       }
     },
 
     getParams() {
+      var vm = this;
       var data = {};
       var tmp;
       var paramPK = location.href.split("?")[0].split("/");
-      this.pk = paramPK[paramPK.length - 1];
+      vm.pk = paramPK[paramPK.length - 1];
       var paramStr = location.href.split("?")[1];
       if (paramStr) {
         var paramsArr = paramStr.split("&");
-        paramsArr.forEach(v => {
+        paramsArr.forEach(function(v) {
           tmp = v.split("=");
           data[tmp[0]] = decodeURIComponent(tmp[1]);
         });
       }
       if (data.sceneCode) {
-        this.params_01 = data;
+        vm.params_01 = data;
       } else {
-        this.params = data;
+        vm.params = data;
       }
     },
     // 处理流程实例id
@@ -1729,7 +1813,7 @@ export default {
             billType: vm.params.billType,
             billId:vm.params.billId
         }
-      }).then(response => {
+      }).then(function(response) {
         // 获取驳回下拉列表
         if (response.data.status === true) {
           if(response.data.data){
@@ -1743,49 +1827,50 @@ export default {
             vm.requestAction();
           }
         } 
-      }).catch(error => {
+      }).catch(function(error) {
           // vm.$message.error("获取流程实例失败！");
       });
     },
 
     getUser() {
-      this.$http({
+      var vm = this;
+      vm.$http({
         url:
           "/ifbp-bpm-service/identity/info/07016fea-dfc7-11e7-b686-005056944e95",
         method: "get"
-      }).then(res => {
+      }).then(function(res) {
 
-        }).catch(() => {
-          this.$message.error("请求失败");
+        }).catch(function() {
+          vm.$message.error("请求失败");
         });
     },
 
-    // initiateProcess() {
-    //   var params = {
-    //     buzicode: "KHGL",
-    //     sceneCode: this.params_01.sceneCode,
-    //     processInstanceName: "个人客户流程",
-    //     businessKey: this.pk,
-    //     mdPK: this.pk
-    //   };
-    //   this.$http({
-    //     url: "/ifbp-bpm-service/proc/start",
-    //     method: "post",
-    //     data: params
-    //   }).then(res => {
-    //       if (res.data.status === 1) {
-    //         this.$message({
-    //           type: "success",
-    //           message: "发起流程成功"
-    //         });
-    //       } else {
-    //         this.$message.error(res.data.msg);
-    //       }
-    //     }).catch(() => {
-    //       this.$message.error("发起失败");
-    //     });
-    // }
-
+    /**initiateProcess() {
+      var vm = this;
+      var params = {
+        buzicode: "KHGL",
+        sceneCode: vm.params_01.sceneCode,
+        processInstanceName: "个人客户流程",
+        businessKey: vm.pk,
+        mdPK: vm.pk
+      };
+      vm.$http({
+        url: "/ifbp-bpm-service/proc/start",
+        method: "post",
+        data: params
+      }).then(function(res) {
+          if (res.data.status === 1) {
+            vm.$message({
+              type: "success",
+              message: "发起流程成功"
+            });
+          } else {
+            vm.$message.error(res.data.msg);
+          }
+        }).catch(function() {
+          vm.$message.error("发起失败");
+        });
+    }*/ 
   },
   created() {
       this.doParams();
