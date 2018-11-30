@@ -262,7 +262,6 @@ export default {
   line-height: 48px;
   display: inline-block;
   overflow: hidden;
-  padding-right:24px;
 }
 .btn-line-wrapper .font-btns *,
 .btn-line-wrapper .search-section *,
@@ -326,7 +325,7 @@ export default {
 }
 </style>
 <style>
-.btn-line-wrapper .search-section .btn-more {
+.btn-line-wrapper .search-section .btn-more i{
   line-height: initial;
   color: #5cb0e6;
 }
