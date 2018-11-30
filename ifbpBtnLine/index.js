@@ -1,4 +1,4 @@
-import IfbpBtnLine from 'src/ifbpBtnLine';
+import IfbpBtnLine from './src/ifbpBtnLine';
 
 /* istanbul ignore next */
 IfbpBtnLine.install = function(Vue) {
