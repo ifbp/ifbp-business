@@ -1264,7 +1264,6 @@ export default {
       if (vm.action === "agreeAble") {
         if(vm.designateList.length > 0){
           vm.$refs["assignFormRef"].validate(function(valid){
-            debugger;
                 if (valid) {
                     var selectuser = [];  
                     var activityDefId  = "";                 
@@ -1289,43 +1288,6 @@ export default {
                     var em = {};
                     em.nolockandconsist = "Y";
                     var param = JSON.stringify(obj);
-                    vm.$http({
-                      url: "/riart/fbpworkflows/doAction",
-                      method: "post",
-                      data: {
-                        action : "agree",
-                        param : param,
-                        billType : vm.params.billType,
-                        billId : vm.params.billId,
-                        agentuserId:vm.params.agentuserId,
-                        pk_checkflow:""
-                      },
-                      timeout:60000
-                    }).then(function(response) {
-                      vm.dialogFormVisible = false;
-                      if (response && response.data && response.data.status === true) {                
-                        vm.$message({
-                          type: "success",
-                          message: "处理成功"
-                        });
-          //            vm.$router.push(url);
-                        vm.requestHistory();
-                        vm.requestAction();
-                        vm.isAgree = false;
-          //            vm.requestPerson();
-          //            vm.approveState();
-          //            vm.historyList();
-                        vm.$emit("afterAction",vm.action);
-                        vm.refreshWidget();
-                      } else if (response && response.data && response.data.status === false) {
-                        vm.$message({
-                          type: "error",
-                          message: response.data.msg
-                        });
-                      }
-                    }).catch(function(error) {
-                      vm.dialogFormVisible = false;
-                    });
                   } ;
             });
         }else{
@@ -1338,7 +1300,8 @@ export default {
             em.nolockandconsist = "Y";
             obj.eParam = em;
             var param = JSON.stringify(obj);
-            vm.$http({
+        };
+        vm.$http({
               url: "/riart/fbpworkflows/doAction",
               method: "post",
               data: {
@@ -1374,8 +1337,7 @@ export default {
               }
             }).catch(function(error) {
               vm.dialogFormVisible = false;
-            });
-        };       
+            });       
 
       } else if (vm.action === 'cancelApprove') {
               var obj = {};
@@ -1393,7 +1355,6 @@ export default {
                       pk_checkflow:''
                   }
               }).then(function(response) {
-                debugger;
                   vm.dialogCancelApprove = false;
                   if (response && response.data && (response.data.status === true)) {  
                       vm.$message({

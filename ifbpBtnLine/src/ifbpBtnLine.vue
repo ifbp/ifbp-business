@@ -266,7 +266,7 @@ export default {
 .btn-line-wrapper .font-btns *,
 .btn-line-wrapper .search-section *,
 .btn-line-wrapper .icon-btns * {
-  vertical-align: middle;
+  vertical-align: middle; 
 }
 
 .font-btns,
@@ -289,6 +289,7 @@ export default {
 }
 .btn-line-wrapper .font-btns > .el-dropdown span {
   color: #5cb0e6;
+  vertical-align:unset;
 }
 
 .font-btns-dropdown {
@@ -326,11 +327,9 @@ export default {
 </style>
 <style>
 .btn-line-wrapper .search-section .btn-more i{
-  line-height: initial;
+  line-height: unset;
+  vertical-align:middle;
   color: #5cb0e6;
-}
-.btn-line-wrapper .search-section .el-input {
-  vertical-align:baseline;
 }
 .btn-line-wrapper .font-btns span {
   font-size: 14px;
