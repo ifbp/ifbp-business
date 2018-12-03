@@ -348,12 +348,35 @@
             <el-button @click="cancel">取 消</el-button>
             <el-button type="primary" @click="confirm">确 定</el-button>
           </div>
+          
+            <template v-if="action === 'agreeAble'">
+            <el-form label-position="left" ref="assignFormRef" :model="assignFormData" :rules="rules">
+              <el-form-item label="下一环节:" :label-width="formLabelWidth"  v-if='optionData.length > 0'>
+                  <el-input  v-model="inputVal" :editable="false"></el-input>
+              </el-form-item>
+              <!---->
+              <el-form-item label="指派:" :label-width="formLabelWidth" required prop="designate" v-if='optionData&&optionData.length > 0'>
+                  <el-select v-model="assignFormData.designate" multiple placeholder="请选择">
+                      <el-option
+                        v-for="item in optionData"
+                        :label="item.name"
+                        :value="item.pk_user"
+                        :key="item.pk_user"
+                      >
+                      </el-option>
+                  </el-select>
+              </el-form-item>
+              <el-form-item label="审批意见：" :label-width="formLabelWidth">
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="同意"></el-input>
+              </el-form-item>
+            </el-form>
+          </template>
           <template v-if="action === 'rejectAble'">
-            <el-form label-position="left">
+            <el-form label-position="left" >
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
                 <el-input type="textarea" v-model="opinion" :rows="2" placeholder="驳回"></el-input>
               </el-form-item>
-              <el-form-item label="驳回到：" :label-width="formLabelWidth">
+              <el-form-item label="驳回到：" :label-width="formLabelWidth" >
                 <el-select v-model='rejectTo' placeholder="请选择节点">
                   <el-option
                     v-for="node in nodeList"
@@ -382,7 +405,7 @@
               </el-form-item>
             </el-form>
           </template>-->
-          <template v-else-if="action === 'refuseAble'">
+          <template v-if="action === 'refuseAble'">
             <el-form label-position="left">
               <el-form-item label="审批意见：" :label-width="formLabelWidth">
                 <el-input type="textarea" v-model="opinion" :rows="2" placeholder="不同意"></el-input>
@@ -390,28 +413,8 @@
             </el-form>
           </template>
 
-          <template v-else-if="action === 'agreeAble'">
-            <el-form label-position="left" ref="assignFormRef" :model="assignFormData" :rules="rules">
-              <el-form-item label="下一环节:" :label-width="formLabelWidth" v-show="designateList.length">
-                  <el-input  v-model="inputVal" :editable="false"></el-input>
-              </el-form-item>
-              <el-form-item label="指派:" :label-width="formLabelWidth" required prop="designate">
-                  <el-select v-model="assignFormData.designate" multiple placeholder="请选择">
-                      <el-option
-                        v-for="item in optionData"
-                        :label="item.name"
-                        :value="item.pk_user"
-                        :key="item.pk_user"
-                      >
-                      </el-option>
-                  </el-select>
-              </el-form-item>
-              <el-form-item label="审批意见：" :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="同意"></el-input>
-              </el-form-item>
-            </el-form>
-          </template>
-          <template v-else-if="action === 'addsignAble'" class="addsign">
+
+          <template v-if="action === 'addsignAble'" class="addsign">
             <el-form label-position="left">
               <el-form-item label="人员：" :label-width="formLabelWidth">
                 <el-ref :is-muti-select="true"
@@ -425,7 +428,7 @@
               </el-form-item>
             </el-form>
           </template>
-          <template v-else-if="action === 'delegateAble'" class="addsign">
+          <template v-if="action === 'delegateAble'" class="addsign">
             <el-form label-position="left">
               <el-form-item label="人员：" :label-width="formLabelWidth">
                 <el-ref :is-muti-select="false"
@@ -446,7 +449,7 @@
             <iframe :src="flowUrl" frameborder="0" style="width: 100%;height: 100%;"></iframe>
           </div>
           <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button @click="resetForm()">取 消</el-button>
             <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
           </span>
         </el-dialog>
@@ -773,6 +776,10 @@ export default {
     },
     getAssignment() {
       var vm = this;
+      vm.assignFormData.designate = [];
+      vm.designateList = [];
+      vm.inputVal = "";
+      vm.optionData = [];
       var params = {
         billType: vm.params.billType,
 				billId:vm.params.billId
@@ -792,9 +799,14 @@ export default {
                   vm.$set(item, "participants_01", []);
                   item.participants_02 = [];
                 });
+                vm.dialogFormVisible = true;
             }
           } else {
+            vm.assignFormData.designate = [];
             vm.designateList = [];
+            vm.inputVal = "";
+            vm.optionData = [];
+            vm.dialogFormVisible = true;
           }
         }).catch(function() {
           vm.$message.error("获取被指派人列表失败");
@@ -1109,7 +1121,6 @@ export default {
       if (vm.action === "agreeAble") {
         //判断btnLists（数组）里面有没有"assignAble"，如果有的话，会出现下拉,掉接口
         vm.getAssignment();
-        vm.dialogFormVisible = true;
       } else if (vm.action === "refuseAble") {
         vm.dialogFormVisible = true;
       } else if (vm.action === "rejectAble") {
@@ -1166,7 +1177,6 @@ export default {
         if (vm.action === "agreeAble") {
           //判断btnLists（数组）里面有没有"assignAble"，如果有的话，会出现下拉,掉接口
           vm.getAssignment();
-          vm.dialogFormVisible = true;
         } else if (vm.action === "refuseAble") {
           vm.dialogFormVisible = true;
         } else if (vm.action === "rejectAble") {
@@ -1288,6 +1298,43 @@ export default {
                     var em = {};
                     em.nolockandconsist = "Y";
                     var param = JSON.stringify(obj);
+                    vm.$http({
+                      url: "/riart/fbpworkflows/doAction",
+                      method: "post",
+                      data: {
+                        action : "agree",
+                        param : param,
+                        billType : vm.params.billType,
+                        billId : vm.params.billId,
+                        agentuserId:vm.params.agentuserId,
+                        pk_checkflow:""
+                      },
+                      timeout:60000
+                    }).then(function(response) {
+                      vm.dialogFormVisible = false;
+                      if (response && response.data && response.data.status === true) {                
+                        vm.$message({
+                          type: "success",
+                          message: "处理成功"
+                        });
+          //            vm.$router.push(url);
+                        vm.requestHistory();
+                        vm.requestAction();
+                        vm.isAgree = false;
+          //            vm.requestPerson();
+          //            vm.approveState();
+          //            vm.historyList();
+                        vm.$emit("afterAction",vm.action);
+                        vm.refreshWidget();
+                      } else if (response && response.data && response.data.status === false) {
+                        vm.$message({
+                          type: "error",
+                          message: response.data.msg
+                        });
+                      }
+                    }).catch(function(error) {
+                      vm.dialogFormVisible = false;
+                    });
                   } ;
             });
         }else{
@@ -1300,8 +1347,7 @@ export default {
             em.nolockandconsist = "Y";
             obj.eParam = em;
             var param = JSON.stringify(obj);
-        };
-        vm.$http({
+            vm.$http({
               url: "/riart/fbpworkflows/doAction",
               method: "post",
               data: {
@@ -1337,7 +1383,9 @@ export default {
               }
             }).catch(function(error) {
               vm.dialogFormVisible = false;
-            });       
+            });
+        };
+               
 
       } else if (vm.action === 'cancelApprove') {
               var obj = {};
@@ -1745,7 +1793,12 @@ export default {
           });
       }
     },
-
+    resetForm() {
+      debugger;
+      var vm = this;
+      vm.$refs["assignFormRef"].resetFields();
+      vm.dialogVisible = false
+    },
     getParams() {
       var vm = this;
       var data = {};
