@@ -18,7 +18,8 @@
     "gridLayout-fis",
     "ifbpDomPrint",
     "ifbpDocumentPreview",
-    "ifbpBtnLine"
+    "ifbpBtnLine",
+    "assignsubmit"
   ],
   "scripts": {},
   "repository": {},
