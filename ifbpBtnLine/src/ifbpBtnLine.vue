@@ -384,17 +384,17 @@ export default {
 }
 .all-btns-dropdown {
   width: 268px;
-  padding: 8px 16px;
+  padding:0;
   color: #5cb0e6;
 }
 .all-btns-dropdown .el-dropdown-menu__item {
-  padding-left: 0;
+  padding-left: 16px;
   line-height: 36px;
   font-size: 14px;
   color: #5cb0e6;
 }
 .all-btns-dropdown .el-dropdown-menu__item i {
-  vertical-align: middle;
+  vertical-align:bottom;
 }
 .btn-line-wrapper .icon-btns i {
   margin: 0 0 0 24px;
@@ -434,5 +434,11 @@ export default {
 .el-dropdown-menu.font-btns-dropdown .el-dropdown-menu__item.is-disabled,
 .el-dropdown-menu.all-btns-dropdown .el-dropdown-menu__item.is-disabled {
   color: rgba(92, 176, 230, 0.5);
+}
+.el-dropdown-menu.all-btns-dropdown .el-dropdown-menu__item:not(.is-disabled):hover{
+   color:#2a9be3;
+}
+.all-btns-dropdown > div{
+  padding:12px 8px 4px 16px;
 }
 </style>
