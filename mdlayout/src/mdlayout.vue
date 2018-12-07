@@ -33,8 +33,13 @@
     },
     mounted() {
       var oThis=this;
+      // 判断 路由中是否有mainNoPadding,如果有，则以处理内容去高度为全屏(540)，此时由此main-right不会有滚动条。
+      //      如果无，则在此给容器减少8px，使main-right无滚动条。
+      var isMainPt=this.$route.query.mainNoPadding;
+      var mainPt=0;
+      if(!Boolean(isMainPt)){mainPt=8};
       //初始化容器高度;
-      this.handleConHeight();
+      this.handleConHeight(mainPt);
       this.handleAsideWidth();
       
       var listEl = document.querySelector(".mdlayout-page-section");
@@ -57,16 +62,17 @@
         }
       });
       window.onresize=function(){
-        oThis.handleConHeight();
+        oThis.handleConHeight(mainPt);
         oThis.handleAsideWidth();
       };
     },
     methods: {
       //处理容器高度;
-      handleConHeight(){
+      handleConHeight(mainPt){
+        var mainPt=mainPt||0;
         let windowH=$(window).height();
         let headerH=$(".header").height();
-        let contentH=windowH-headerH;
+        let contentH=windowH-headerH-mainPt;
         $(".mdlayout-wrapper,.mdlayout-aside,.mdlayout-main").css("height",contentH);        
       },
       // 点击mdlayout-master的一项
@@ -87,12 +93,13 @@
              mdlayoutAside.css("left","0");
           }
         }else{
-          if(parseInt(mdlayoutAside.css("left"))<0){
-            mdlayoutAside.css("left","0");
-            mdlayoutMain.css("margin-left",this.asideWidth);
-            $(".mdlayout-page .mdlayout-header-func .header-icon").css("display","none");
+            if(parseInt(mdlayoutAside.css("left"))<0){
+              mdlayoutAside.css("left","0");
+              mdlayoutMain.css("margin-left",this.asideWidth);
+              $(".mdlayout-page .mdlayout-header-func .header-icon").css("display","none");
+          }
         }
-        }
+        this.$emit("showMastList",this);
         
       },
       // hide mdlayout-aside
