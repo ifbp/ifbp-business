@@ -40,6 +40,13 @@
     created(){
     },
     mounted(){
+      var vm=this;
+      $(window).resize(function(){
+        vm.handlPageSectionHeight();
+      })
+
+      this.handlPageSectionHeight();
+
       if(window.isIE){
         //在IE下,初始化 scrollBar 插件;
         scrollBar(jQuery);
@@ -47,7 +54,6 @@
           barWidth:5
         });
       };
-      this.handlPageSectionHeight();
     },
     methods: {
       hideMdlayoutMasterList(){
