@@ -293,8 +293,9 @@
 	          }
 	        },
 	        handleCloseSelf(key){
-	        	this.selected = [];
+	        	
 	        	if(key == 'cancel'){
+							this.selected = [];
 	        		this.dialogRoleVisible = false;
 	        	}else{
 	        		this.copyRole();
