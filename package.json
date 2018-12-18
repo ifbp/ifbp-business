@@ -19,13 +19,14 @@
     "ifbpDomPrint",
     "ifbpDocumentPreview",
     "ifbpBtnLine",
-    "assignsubmit"
+    "assignsubmit",
+    "mobile"
   ],
   "scripts": {},
   "repository": {},
   "keywords": [],
   "dependencies": {
-    "element-resize-detector": "^1.1.10",   
+    "element-resize-detector": "^1.1.10",
     "interactjs": "^1.3.4"
   },
   "peerDependencies": {},
