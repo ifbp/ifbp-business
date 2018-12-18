@@ -62,11 +62,12 @@
             this.$nextTick(()=>{
                 if(this.billType !== '' && this.billId !== ''){
                     this.request();
+                }else{
+                    console.log('billType或billId为空。');
                 }
             });
         },
         request(){
-            debugger;
             var vm = this;
             let requestUrl = '/riart/fbpworkflows/assignsubmit';
             vm.$http({
@@ -102,7 +103,6 @@
             });
         },
         btnConfirm(){
-            debugger;
             var vm = this;
             if(vm.designateList){
                 vm.$refs["assignFormRef"].validate(function(valid){
