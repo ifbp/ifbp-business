@@ -1,5 +1,5 @@
 <template>
-    <div class="btn-line-wrapper" id="btnLineWrap" :style="{width:width+'px','text-align':textAlign}"><!--
+    <div class="btn-line-wrapper" id="btnLineWrap" ref="btnLineWrap" :style="{'text-align':textAlign}"><!--
          左侧 文字按钮区域 
         --><div class="font-btns" id="fontBtnSec" v-if="showTextBtns">
             <!-- 默认最多显示3个文字按钮 -->
@@ -19,7 +19,7 @@
             </template>
         </div><!--
          搜索对话框区域 this.$slots['search-dialog'] 
-        --><div class="search-section" id="searchSec" v-if="showBigSearch">
+        --><div class="search-section" id="searchSec" v-show="showBigSearch">
             <slot name="search-dialog"></slot>
         </div><!-- 
             右侧 图标按钮区域 
@@ -34,7 +34,7 @@
                     <i class="ifbp-icon-more" title="更多"></i>
                     <el-dropdown-menu slot="dropdown" class="all-btns-dropdown">
                         <!-- 搜索框 -->
-                        <template v-if="!showBigSearch">
+                        <template v-show="!showBigSearch">
                             <slot name="search-dialog"></slot>
                         </template>
                         <!-- 显示 文字按钮 -->
@@ -55,6 +55,7 @@
     </div>
 </template>
 <script>
+import { addResizeListener, removeResizeListener } from "./resize-event";
 export default {
   name: "ifbpBtnLine",
   props: {
@@ -97,17 +98,18 @@ export default {
         return true;
       }
     },
-    width: {
-      type: Number,
-      default: 700
-    },
     textAlign: {
       type: String,
       default: "left"
+    },
+    slotWidth:{
+      type:Number,
+      default:273
     }
   },
   data() {
     return {
+      width:0,
       currentIconBtns: this.iconBtnArr,
       currentTextBtns: this.textBtnArr,
       showBigSearch: true,
@@ -127,7 +129,6 @@ export default {
     };
   },
   created() {
-    
     var vm = this;
     $.each(vm.currentTextBtns, function(index, textBtn) {
       textBtn["width"] = 14 * textBtn.fontNum + 24;
@@ -141,9 +142,24 @@ export default {
     $.each(this.currentIconBtns, function(index, iconBtn) {
       iconBtn["width"] = 18 + 24;
     });
+  },
+  mounted(){
+    var vm=this;
+    // 根据传入slot-width，设置slot的宽度;
+      $("#searchSec").width(vm.slotWidth);
+    // 获取 容器的 宽度;并监听 宽度变化 随时进行计算;
+    vm.calcWrapperWidth();
+    var btnWrapper=this.$refs["btnLineWrap"];
+    addResizeListener(btnWrapper, function() {
+        vm.calcWrapperWidth();
+      });
     // 设置不同的边界值;
     var nodeRange = this.getNodeRange();
     this.handleChgStyle(nodeRange, this.width);
+  },
+  beforeDestroy(){
+    var btnWrapper=this.$refs["btnLineWrap"];
+    removeResizeListener(btnWrapper);
   },
   watch: {
     iconBtnArr(newVal, oldVal) {
@@ -164,19 +180,28 @@ export default {
           }
         });
         // 重新计算;
-        var nodeRange = vm.getNodeRange();
-        vm.handleChgStyle(nodeRange, vm.width);
+        window.setTimeout(function(){
+          var nodeRange = vm.getNodeRange();
+          vm.handleChgStyle(nodeRange, vm.width);
+        },150)      
       },
       deep: true //watch 深度监听
     },
     // 监测组件宽度变化;
     width(newVal, oldVal) {
       var vm = this;
-      var nodeRange = this.getNodeRange();
-      vm.handleChgStyle(nodeRange, newVal);
+      window.setTimeout(function(){
+        var nodeRange = vm.getNodeRange();
+        vm.handleChgStyle(nodeRange, newVal);
+      },150)
     }
   },
   methods: {
+    // 计算容器的宽度;
+    calcWrapperWidth(){
+      var btnLineWrap=this.$refs["btnLineWrap"];
+      this.width=btnLineWrap.clientWidth;
+    },
     // 点击文字按钮触发;
     handleBtnClick(btn) {
       btn.fn();
@@ -195,7 +220,7 @@ export default {
       //中间search;
       var searchSecW = 0;
       if (this.$slots["search-dialog"]) {
-        searchSecW = 273;
+        searchSecW = this.slotWidth;
       }
       step[5] = step[4] + searchSecW || step[4];
       //右侧;
