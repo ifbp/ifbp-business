@@ -55,7 +55,7 @@
     </div>
 </template>
 <script>
-import { addResizeListener, removeResizeListener } from "./resize-event";
+import { addResizeListener, removeResizeListener } from './resize-event';
 export default {
   name: "ifbpBtnLine",
   props: {
@@ -104,7 +104,7 @@ export default {
     },
     slotWidth:{
       type:Number,
-      default:273
+      default:250
     }
   },
   data() {
@@ -150,16 +150,13 @@ export default {
     // 获取 容器的 宽度;并监听 宽度变化 随时进行计算;
     vm.calcWrapperWidth();
     var btnWrapper=this.$refs["btnLineWrap"];
-    addResizeListener(btnWrapper, function() {
-        vm.calcWrapperWidth();
-      });
     // 设置不同的边界值;
     var nodeRange = this.getNodeRange();
     this.handleChgStyle(nodeRange, this.width);
+    addResizeListener(vm.$el,vm.calcWrapperWidth);
   },
-  beforeDestroy(){
-    var btnWrapper=this.$refs["btnLineWrap"];
-    removeResizeListener(btnWrapper);
+  beforeDestroy() {
+    if (this.$el) removeResizeListener(this.$el, vm.calcWrapperWidth);
   },
   watch: {
     iconBtnArr(newVal, oldVal) {
@@ -200,7 +197,11 @@ export default {
     // 计算容器的宽度;
     calcWrapperWidth(){
       var btnLineWrap=this.$refs["btnLineWrap"];
-      this.width=btnLineWrap.clientWidth;
+      if(btnLineWrap.style.width){
+        this.width=btnLineWrap.clientWidth;
+      }else{
+        this.width=parseInt($(btnLineWrap).css("width"));
+      }
     },
     // 点击文字按钮触发;
     handleBtnClick(btn) {
@@ -378,6 +379,7 @@ export default {
   line-height: 48px;
   display: inline-block;
   overflow: hidden;
+  width:100%;
 }
 .btn-line-wrapper .font-btns *,
 .btn-line-wrapper .search-section *,
@@ -438,6 +440,12 @@ export default {
 }
 </style>
 <style>
+.search-section .search-dialog-container .search-input-wrap{
+  text-align:left;
+}
+.search-section .search-input-wrap .el-input{
+  width:calc(100% - 44px);
+}
 .btn-line-wrapper .search-section .btn-more i {
   line-height: unset;
   vertical-align: middle;
