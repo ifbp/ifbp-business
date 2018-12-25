@@ -19,7 +19,7 @@
             </template>
         </div><!--
          搜索对话框区域 this.$slots['search-dialog'] 
-        --><div class="search-section" id="searchSec" v-show="showBigSearch">
+        --><div class="search-section" id="searchSec" v-show="showBigSearch" v-if="$slots['search-dialog']">
             <slot name="search-dialog"></slot>
         </div><!-- 
             右侧 图标按钮区域 
