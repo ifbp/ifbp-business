@@ -20,7 +20,8 @@
     "ifbpDocumentPreview",
     "ifbpBtnLine",
     "assignsubmit",
-    "mobile"
+    "mobile",
+    "tableHeightMixin"
   ],
   "scripts": {},
   "repository": {},
