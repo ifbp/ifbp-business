@@ -386,6 +386,10 @@
                   </el-option>
                 </el-select>
               </el-form-item>
+				<el-form-item label="是否重走流程：" :label-width="formLabelWidth">
+					<el-radio class="radio" v-model="isRepeat" label="1">重走流程</el-radio>
+					<el-radio class="radio" v-model="isRepeat" label="2">不重走流程</el-radio>
+				</el-form-item>
             </el-form>
           </template>
           <!--<template v-else-if="action === 'assignAble'">
@@ -526,6 +530,7 @@ export default {
       linkIframe: "",
       opinion: "",
       rejectTo: "",
+	  isRepeat: "1",
       userId: "",
       nodeList: [],
       personList: [],
@@ -1488,6 +1493,9 @@ export default {
           var param_reject_activity = vm.rejectTo;
           obj.param_note = vm.opinion;
           obj.param_reject_activity = param_reject_activity;
+		  var em = {};
+		  em.isRepeat = vm.isRepeat;
+		  obj.eParam = em;
           var param = JSON.stringify(obj);
           var params;
           if (vm.rejectTo === "REJECTTOINIT") {
