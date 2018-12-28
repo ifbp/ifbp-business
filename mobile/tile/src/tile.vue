@@ -8,9 +8,9 @@
         {{title || childItem.appName}}
       </div>
     </div>
-    <div :class="['card-icon-status',(iconStatus || childItem.iconStatus)==='add'?'card-add':'',(iconStatus|| childItem.iconStatus)==='minus'?'card-minus':'']" v-if="(iconStatus || childItem.iconStatus)" @click="iconClick(childItem)">
-      <i class="ifbp-icon-add-circle mt-icon-add" v-if="(iconStatus || childItem.iconStatus)==='add'"></i>
-      <i class="ifbp-icon-remove-circle mt-icon-remove" v-if="(iconStatus || childItem.iconStatus)==='minus'"></i>
+    <div :class="['card-icon-status',iconStatus === 'add'?'card-add':'', iconStatus ==='minus'?'card-minus':'']" v-if="iconStatus" @click="iconClick(childItem)">
+      <i class="ifbp-icon-add-circle mt-icon-add" v-if="iconStatus==='add'"></i>
+      <i class="ifbp-icon-remove-circle mt-icon-remove" v-if="iconStatus ==='minus'"></i>
     </div>
   </div>
 </template>
@@ -46,7 +46,8 @@ export default {
       type:Object
     },
     iconStatus: {
-      type:String
+      type:String,
+      default:''
     },
     child: {
       type: Object
