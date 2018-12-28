@@ -2,29 +2,29 @@
   <div class="mobile-card" :class="sizeClass" :style="styleObject" @click="cardClick">
     <div class="mobile-card-info">
       <div class="mobile-card-info-icon">
-        <i :class="icon ? icon : 'ifbp-icon-Track'" :style="{'color':iconColor}"></i>
+        <i :class="(icon || childItem.icon) ? (icon || childItem.icon) : 'ifbp-icon-Track'" :style="{'color':(iconColor||childItem.iconColor)}"></i>
       </div>
       <div class="mobile-card-title">
-        {{title}}
+        {{title || childItem.appName}}
       </div>
     </div>
-    <div :class="['card-icon-status',iconStatus==='add'?'card-add':'',iconStatus==='minus'?'card-minus':'']" v-if="iconStatus">
-      <i class="ifbp-icon-add" v-if="iconStatus==='add'"></i>
-      <i class="ifbp-icon-close" v-if="iconStatus==='minus'"></i>
+    <div :class="['card-icon-status',(iconStatus || childItem.iconStatus)==='add'?'card-add':'',(iconStatus|| childItem.iconStatus)==='minus'?'card-minus':'']" v-if="(iconStatus || childItem.iconStatus)" @click="iconClick(childItem)">
+      <i class="ifbp-icon-add-circle mt-icon-add" v-if="(iconStatus || childItem.iconStatus)==='add'"></i>
+      <i class="ifbp-icon-remove-circle mt-icon-remove" v-if="(iconStatus || childItem.iconStatus)==='minus'"></i>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'MobileTile',
   data() {
     return {
       sizeClass:'sm',
       styleObject: {
         color: '#333',
         fontSize: '12px'
-      }
+      },
+      childItem: {}
     };
   },
   props: {
@@ -47,16 +47,28 @@ export default {
     },
     iconStatus: {
       type:String
+    },
+    child: {
+      type: Object
     }
   },
   watch: {
     cardStyle(val) {
       this.styleObject = val;
+    },
+    child: {
+      deep: true,
+      handler(val) {
+        this.childItem = val;
+      }
     }
   },
   methods: {
     cardClick() {
       this.$emit('card-click');
+    },
+    iconClick(child) {
+      this.$emit('card-icon-click',child);
     }
   },
   created() {
@@ -68,10 +80,12 @@ export default {
         }
   },
   mounted() {
+    this.childItem = this.child;
 
   }
 }
 </script>
+
 <style lang="css">
 div {
   margin: 0;
@@ -97,7 +111,7 @@ div {
   box-sizing: border-box;
 }
 .mobile-card:hover {
-  border: 1px solid #6bcaea;
+  /* border: 1px solid #6bcaea; */
   cursor: pointer;
 }
 .mobile-card-title {
@@ -135,13 +149,17 @@ div {
 }
 .card-icon-status i{
   font-size: 24px;
-  color: #fff;
+  /* color: #fff; */
 }
-.card-icon-status.card-minus {
-  background-color:#E60012;
+.mt-icon-add{
+ /* color: rgb(53,138,242); */
+ color: #0089FA;
 }
-.card-icon-status.card-add {
-  background-color:#0089FA;
+.mt-icon-remove{
+  /* color: rgb(237,101,100); */
+  color: #FF595F
+;
 }
+
 
 </style>
