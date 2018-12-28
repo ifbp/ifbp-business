@@ -4,11 +4,21 @@
         --><div class="font-btns" id="fontBtnSec" v-if="showTextBtns">
             <!-- 默认最多显示3个文字按钮 -->
             <template v-for="(btn,index) in leftTextBtns">
-                <el-button :key="index" type="text" @click="handleBtnClick(btn)" :disabled="btn.disabled">{{btn.title}}</el-button>    
+                <!-- 如果是按钮组,则渲染 下拉组件 -->
+                <el-dropdown v-if="btn.itemArr" :key="index" @command="subBtnCommandFn" menu-align="start">
+                    <span>{{btn.title}}<i class="el-icon-caret-bottom el-icon--right"></i></span>
+                    <el-dropdown-menu slot="dropdown" class="font-btns-dropdown">
+                      <template v-for="(subBtn,id) in btn.itemArr">
+                          <el-dropdown-item :key="id" :command="subBtn.command" :disabled="subBtn.disabled">{{subBtn.title}}</el-dropdown-item>
+                      </template>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <!--如果非按钮组,则渲染 button -->
+                <el-button v-else :key="index"  type="text" @click="handleBtnClick(btn)" :disabled="btn.disabled">{{btn.title}}</el-button>    
             </template>
             <template v-if="leftDropDownBtns.length>0">
                 <!-- 按钮过多时,显示为下拉按钮 -->
-                <el-dropdown @command="this.dropDownCommandFn" menu-align="start">
+                <el-dropdown @command="moreBtnDropDown" menu-align="start">
                     <span>更多<i class="el-icon-caret-bottom el-icon--right"></i></span>
                     <el-dropdown-menu slot="dropdown" class="font-btns-dropdown">
                         <template v-for="(dropdown,index) in leftDropDownBtns">
@@ -131,7 +141,11 @@ export default {
   created() {
     var vm = this;
     $.each(vm.currentTextBtns, function(index, textBtn) {
-      textBtn["width"] = 14 * textBtn.fontNum + 24;
+      let textBtnWidth = 14*textBtn.fontNum + 24 ;
+      if(textBtn.itemArr){
+        textBtnWidth += 18;
+      }
+      textBtn["width"] = textBtnWidth
       if (textBtn.visible) {
         //过滤,实际上展示的只是显示的按钮,不是currentTextBtns;
         vm.visibleTextBtnArr.push(textBtn);
@@ -152,6 +166,8 @@ export default {
     var btnWrapper=this.$refs["btnLineWrap"];
     // 设置不同的边界值;
     var nodeRange = this.getNodeRange();
+    console.log("边界值==>");
+    console.log(nodeRange);
     this.handleChgStyle(nodeRange, this.width);
     addResizeListener(vm.$el,vm.calcWrapperWidth);
   },
@@ -217,23 +233,27 @@ export default {
           step[index + 1] = step[index] + textBtn.width;
         }
       });
+      // 更多按钮width 70;
       step[4] = (step[3] || step[2] || step[1] || step[0]) + 70;
       //中间search;
       var searchSecW = 0;
       if (this.$slots["search-dialog"]) {
-        searchSecW = this.slotWidth;
+        searchSecW = this.slotWidth +16;
       }
-      step[5] = step[4] + searchSecW || step[4];
+      step[5] = step[4] + searchSecW;
       //右侧;
       $.each(this.currentIconBtns, function(index, iconBtn) {
         step[index + 6] = step[5 + index] + iconBtn.width;
       });
       return step || [];
     },
-    //下拉选择中触发
-    dropDownCommandFn(command) {
-      var vm = this;
-      $.each(this.leftDropDownBtns, function(index, dropDown) {
+    /**
+     *  下拉框选中某项后触发相应函数;
+     *  command: 选中项关键字;
+     *  sourceArr：下拉框各项的数据源数组; 
+     */
+    baseDropDownTrigger(command,sourceArr){
+      $.each(sourceArr, function(index, dropDown) {
         if (dropDown.command === command) {
           var fn = dropDown.fn;
           fn();
@@ -241,30 +261,59 @@ export default {
         }
       });
     },
-    //下拉选择中触发
+    //左侧'更多'文字按钮下拉选中触发;
+    moreBtnDropDown(command) {
+      this.baseDropDownTrigger(command,this.leftDropDownBtns);
+    },
+    //左侧'按钮组' 下拉选中触发;
+    subBtnCommandFn(command) {
+      // debugger;
+      let vm= this;
+      let leftVisibleTextBtns=[];
+      $.each(vm.leftTextBtns,function(key,btn){
+        if(btn.itemArr && btn.itemArr.length){
+          $.each(btn.itemArr,function(key2,item){
+            leftVisibleTextBtns.push(item);
+          })
+        }else{
+          leftVisibleTextBtns.push(btn);
+        }
+      })
+      
+      this.baseDropDownTrigger(command,leftVisibleTextBtns);
+    },
+    //右侧'更多'图标的下拉选中触发;
     rightdropDownFn(command) {
       var vm = this;
-      $.each(this.rightTextBtns, function(index, textBtn) {
-        if (textBtn.command === command) {
-          var fn = textBtn.fn;
-          fn();
-          return false;
+      vm.baseDropDownTrigger(command,vm.rightTextBtns);
+      vm.baseDropDownTrigger(command,vm.rightIconBtns);
+    },
+    /* 
+     * 获取右侧文字按钮数组(主要处理左侧为按钮组时放到右侧展示子按钮的逻辑);
+     * textBtnArr: 左侧展示的文字按钮组;
+     * 
+     */
+    getRightTextBtnArr(textBtnArr){
+      let retTextBtnArr=[];      
+      $.each(textBtnArr,function(id,textBtn){
+        if(textBtn.itemArr && textBtn.itemArr.length){
+          $.each(textBtn.itemArr,function(id2,item){
+            retTextBtnArr.push(item);
+          })
+        }else{
+          retTextBtnArr.push(textBtn);
         }
-      });
-      $.each(this.rightIconBtns, function(index, iconBtn) {
-        if (iconBtn.command === command) {
-          var fn = iconBtn.fn;
-          fn();
-          return false;
-        }
-      });
+      })
+      
+      return retTextBtnArr;
     },
     // 处理不同情况的展示;
     handleChgStyle(nodeRange, fullWidth) {
+      // debugger;
       var vm = this;
       if (nodeRange[1] && fullWidth < nodeRange[1]) {
         vm.hasMoreBtn = true;
-        vm.rightTextBtns = vm.visibleTextBtnArr;
+        vm.rightTextBtns = vm.getRightTextBtnArr(vm.visibleTextBtnArr);
         vm.rightIconBtns = vm.currentIconBtns;
         vm.showBigSearch = false;
         vm.leftTextBtns = [];
@@ -277,9 +326,8 @@ export default {
         vm.hasMoreBtn = true;
         vm.rightIconBtns = vm.currentIconBtns;
         vm.showBigSearch = false;
-
         vm.leftTextBtns = vm.visibleTextBtnArr.slice(0, 1);
-        vm.rightTextBtns = vm.visibleTextBtnArr.slice(1);
+        vm.rightTextBtns = vm.getRightTextBtnArr(vm.visibleTextBtnArr.slice(1));
       } else if (
         nodeRange[2] &&
         nodeRange[3] &&
@@ -291,7 +339,7 @@ export default {
         vm.showBigSearch = false;
 
         vm.leftTextBtns = vm.visibleTextBtnArr.slice(0, 2);
-        vm.rightTextBtns = vm.visibleTextBtnArr.slice(2);
+        vm.rightTextBtns = vm.getRightTextBtnArr(vm.visibleTextBtnArr.slice(2));
       } else if (
         nodeRange[3] &&
         nodeRange[4] &&
@@ -303,7 +351,7 @@ export default {
         vm.showBigSearch = false;
 
         vm.leftTextBtns = vm.visibleTextBtnArr.slice(0, 3);
-        vm.rightTextBtns = vm.visibleTextBtnArr.slice(3);
+        vm.rightTextBtns = vm.getRightTextBtnArr(vm.visibleTextBtnArr.slice(3));
         vm.leftDropDownBtns = [];
       } else if (
         nodeRange[4] &&
