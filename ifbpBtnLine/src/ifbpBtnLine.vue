@@ -172,7 +172,7 @@ export default {
     addResizeListener(vm.$el,vm.calcWrapperWidth);
   },
   beforeDestroy() {
-    if (this.$el) removeResizeListener(this.$el, vm.calcWrapperWidth);
+    if (this.$el) removeResizeListener(this.$el, this.calcWrapperWidth);
   },
   watch: {
     iconBtnArr(newVal, oldVal) {
@@ -196,7 +196,7 @@ export default {
         window.setTimeout(function(){
           var nodeRange = vm.getNodeRange();
           vm.handleChgStyle(nodeRange, vm.width);
-        },150)      
+        },500)      
       },
       deep: true //watch 深度监听
     },
@@ -206,7 +206,7 @@ export default {
       window.setTimeout(function(){
         var nodeRange = vm.getNodeRange();
         vm.handleChgStyle(nodeRange, newVal);
-      },150)
+      },500)
     }
   },
   methods: {
@@ -234,7 +234,11 @@ export default {
         }
       });
       // 更多按钮width 70;
-      step[4] = (step[3] || step[2] || step[1] || step[0]) + 70;
+      if(this.visibleTextBtnArr.length>3){
+        step[4] = (step[3] || step[2] || step[1] || step[0]) + 70;
+      }else{
+        step[4] = (step[3] || step[2] || step[1] || step[0])
+      }
       //中间search;
       var searchSecW = 0;
       if (this.$slots["search-dialog"]) {
@@ -311,13 +315,15 @@ export default {
     handleChgStyle(nodeRange, fullWidth) {
       // debugger;
       var vm = this;
+      // 42 ~ 一个文字按钮长度：展示更多图标；
       if (nodeRange[1] && fullWidth < nodeRange[1]) {
         vm.hasMoreBtn = true;
         vm.rightTextBtns = vm.getRightTextBtnArr(vm.visibleTextBtnArr);
         vm.rightIconBtns = vm.currentIconBtns;
         vm.showBigSearch = false;
         vm.leftTextBtns = [];
-      } else if (
+      } else if ( 
+        // 一个文字按钮+更多图标按钮
         nodeRange[1] &&
         nodeRange[2] &&
         fullWidth > nodeRange[1] &&
@@ -475,6 +481,7 @@ export default {
   margin: 0 0 0 24px;
   color: #5cb0e6;
   font-size: 18px;
+  cursor: pointer;
 }
 .btn-line-wrapper .icon-btns {
   font-size: 0;
