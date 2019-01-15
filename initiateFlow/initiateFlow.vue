@@ -10,7 +10,7 @@
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="firstStep" placement="top">
-                        <span>[{{listData[0].activeName}}]{{listData[0].userName}}</span>
+                        <span>{{listData[0].activeName}}：{{listData[0].userName}}</span>
                       </el-tooltip>
                       <p class="titleData">{{listData[0].startTime}}</p>
                     </div>
@@ -28,7 +28,7 @@
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStep" placement="top">
-                        <span>[{{listData[listData.length-1].activeName}}]{{listData[listData.length-1].userName}}</span>
+                        <span>{{listData[listData.length-1].activeName}}：{{listData[listData.length-1].userName}}</span>
                       </el-tooltip>
                       <p class="titleData">{{listData[listData.length-1].startTime}}</p>
                     </div>
@@ -40,7 +40,7 @@
                       :content="listData[listData.length-1].messagenote"
                       :disabled="listData[listData.length-1].messagenote ? false : true" 
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}}</span> {{listData[listData.length-1].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}} {{listData[listData.length-1].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-close"></div>
                   </div>
@@ -50,7 +50,7 @@
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStep" placement="top">
-                        <span>[{{listData[listData.length-1].activeName}}]{{listData[listData.length-1].userName}}</span>
+                        <span>{{listData[listData.length-1].activeName}}：{{listData[listData.length-1].userName}}</span>
                       </el-tooltip>
                       <p class="titleData">{{listData[listData.length-1].startTime}}</p>
                     </div>
@@ -62,7 +62,7 @@
                       :content="listData[listData.length-1].messagenote" 
                       :disabled="listData[listData.length-1].messagenote ? false : true"
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}}</span> {{listData[listData.length-1].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}} {{listData[listData.length-1].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-edit"></div>
                   </div>
@@ -73,7 +73,7 @@
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStep" placement="top">
-                        <span>[{{listData[listData.length-1].activeName}}]{{listData[listData.length-1].userName}}</span>
+                        <span>{{listData[listData.length-1].activeName}}：{{listData[listData.length-1].userName}}</span>
                       </el-tooltip>
                       <p class="titleData">{{listData[listData.length-1].startTime }}</p>
                     </div>
@@ -85,7 +85,7 @@
                       :content="listData[listData.length-1].messagenote"
                       :disabled="listData[listData.length-1].messagenote ? false : true"
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}}</span> {{listData[listData.length-1].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}} {{listData[listData.length-1].messagenote}}</span></p>
                     </el-tooltip>
                     <!-- 驳回图标 -->
                     <div class="titleNumber ifbp-icon-undo"></div>
@@ -97,7 +97,7 @@
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStep" placement="top">
-                        <span>[{{listData[listData.length-1].activeName}}]{{listData[listData.length-1].userName}}</span>
+                        <span>{{listData[listData.length-1].activeName}}：{{listData[listData.length-1].userName}}</span>
                       </el-tooltip>
                       <p class="titleData">{{listData[listData.length-1].startTime}}</p>
                     </div>
@@ -109,7 +109,7 @@
                       :content="listData[listData.length-1].messagenote" 
                       :disabled="listData[listData.length-1].messagenote ? false : true"
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}}</span> {{listData[listData.length-1].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}} {{listData[listData.length-1].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-check"></div>
                   </div>
@@ -123,7 +123,7 @@
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStepAgree" placement="top">
-                        <span>[{{listData[listData.length-2].activeName}}]{{listData[listData.length-2].userName}}</span>
+                        <span>{{listData[listData.length-2].activeName}}：{{listData[listData.length-2].userName}}</span>
                       </el-tooltip>
                       <p class="titleData">{{listData[listData.length-2].startTime}}</p>
                     </div>
@@ -135,7 +135,7 @@
                       :content="listData[listData.length-2].messagenote"
                       :disabled="listData[listData.length-2].messagenote ? false : true" 
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-2].deleteReason}}</span> {{listData[listData.length-2].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-2].deleteReason}} {{listData[listData.length-2].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-check"></div>
                   </div>
@@ -148,7 +148,7 @@
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStepAgree" placement="top">
-                        <span>[{{listData[listData.length-2].activeName}}]{{listData[listData.length-2].userName}}</span>
+                        <span>{{listData[listData.length-2].activeName}}：{{listData[listData.length-2].userName}}</span>
                       </el-tooltip>
                       <p class="titleData">{{listData[listData.length-2].startTime}}</p>
                     </div>
@@ -160,7 +160,7 @@
                       :content="listData[listData.length-2].messagenote"
                       :disabled="listData[listData.length-2].messagenote ? false : true" 
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-2].deleteReason}}</span> {{listData[listData.length-2].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-2].deleteReason}} {{listData[listData.length-2].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-close"></div>
                   </div>
@@ -173,7 +173,7 @@
                   <div slot="title">
                     <div class="titleText">
                       <el-tooltip class="item" effect="normal" :content="secondStepAgree" placement="top">
-                        <span>[{{listData[listData.length-2].activeName}}]{{listData[listData.length-2].userName}}</span>
+                        <span>{{listData[listData.length-2].activeName}}：{{listData[listData.length-2].userName}}</span>
                       </el-tooltip>
                       <p class="titleData">{{listData[listData.length-2].startTime }}</p>
                     </div>
@@ -185,7 +185,7 @@
                       :content="listData[listData.length-2].messagenote"
                       :disabled="listData[listData.length-2].messagenote ? false : true"
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-2].deleteReason}}</span> {{listData[listData.length-2].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-2].deleteReason}} {{listData[listData.length-2].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-undo"></div>
                   </div>
@@ -224,7 +224,7 @@
                       :content="listData[listData.length-1].messagenote"
                       :disabled="listData[listData.length-1].messagenote ? false : true" 
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}}</span> {{listData[listData.length-1].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}} {{listData[listData.length-1].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-check"></div>
                   </div>
@@ -249,7 +249,7 @@
                       :content="listData[listData.length-1].messagenote"
                       :disabled="listData[listData.length-1].messagenote ? false : true" 
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}}</span> {{listData[listData.length-1].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}} {{listData[listData.length-1].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-close"></div>
                   </div>
@@ -274,7 +274,7 @@
                       :content="listData[listData.length-1].messagenote"
                       :disabled="listData[listData.length-1].messagenote ? false : true"
                       placement="top">
-                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}}</span> {{listData[listData.length-1].messagenote}}</p>
+                      <p class="titleAction"><span>{{listData[listData.length-1].deleteReason}} {{listData[listData.length-1].messagenote}}</span></p>
                     </el-tooltip>
                     <div class="titleNumber ifbp-icon-undo"></div>
                   </div>
@@ -951,7 +951,7 @@ export default {
                           if(vm.waitApproves.length && vm.waitApproves.length >= 1){
                             user =  item.check_userName;  
                           }else{
-                            user = "[" + item.activeName + "] " + item.check_userName;  
+                            user =  item.activeName + "：" + item.check_userName;  
                           }                     
 	                        vm.waitApproves.push(user);
 	                      } else if (deleteReason == "审批后撤回") {
@@ -1975,6 +1975,9 @@ export default {
   line-height: 18px;
   vertical-align: sub;
 }
+.waitAction a {
+  color: #000000;
+}
 .titleNumber {
   position: absolute;
   left: 4px;
@@ -2047,7 +2050,8 @@ export default {
   white-space: nowrap;
 }
 .titleAction span{
-  color: #888;
+  /**color: #888;*/
+  color: #000000;
 }
 #search-container {
   height: 100px;
@@ -2125,7 +2129,7 @@ export default {
 
 .btnLists li {
   float: left;
-  margin-left: 5px;
+  margin-left: 8px;
 }
 .hiddenBtnList{
   position: absolute;
@@ -2334,6 +2338,6 @@ export default {
   padding-left: 1px !important;
 }
 .btnLists .more-btn .btn-more::before{
-  margin-left: 6px !important;
+  margin-left: 8px !important;
 }
 </style>
