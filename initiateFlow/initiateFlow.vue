@@ -304,21 +304,6 @@
             </el-dropdown>
           </li>
         </ul>
-
-        <!-- 会签任务,待认领,已办(全部流程结束或者下一个环节处理完),抄送的任务只显示查看流程图按钮 -->
-		  <!--
-        <ul v-else-if="this.params.stateFlage == 'copyFor' ||
-                      this.params.stateFlage == 'claim' ||
-                      (this.params.stateFlage == 'his' && (this.endActivityId || (!this.endActivityId && this.beenProcessed ))) ||
-                      (this.params.stateFlage == 'todo' && ((this.endActivityId && (this.action == 'refuse' || this.action == 'reject')) || (!this.endActivityId && this.beenProcessed )))" 
-            style="height: 85px">
-          <el-button type="primary" @click="checkFlow" style="margin-left: 10px;">查看流程图</el-button>
-        </ul>
-
-        <ul v-else style="height: 85px">
-          <el-button type="primary" @click="checkFlow" style="margin-left: 10px;">查看流程图</el-button>
-          <el-button type="primary" @click="revocation" style="margin-left: 10px;">撤回</el-button>
-        </ul>-->
       </div>
       <!-- 提交下拉 -->
       <div class="statusLists" v-show="isHiddenList" style="background: #fff" @mouseover="handleMouseover" @mouseout="handleMouseout">
@@ -329,7 +314,7 @@
           <li v-for="(item,index) in listData" :key="item.startTime" style="min-width:390px;">
             <em>{{index+1}}</em>
             <div class="div-content">
-              <strong>[{{item.activeName}}]</strong>
+              <strong>{{item.activeName}}：</strong>
               <span style="font-size: 16px; color: #333;">{{item.userName}}</span>
               <div style="float: right; margin-left: 10px; font-size: 12px; color: #888; display: inline-block">{{item.startTime}}</div>
             </div>
@@ -351,12 +336,12 @@
           
             <template v-if="action === 'agreeAble'">
             <el-form label-position="left" ref="assignFormRef" :model="assignFormData" :rules="rules">
-              <el-form-item label="下一环节:" :label-width="formLabelWidth"  v-if='optionData.length > 0'>
-                  <el-input  v-model="inputVal" :editable="false"></el-input>
-              </el-form-item>
-              <!---->
-              <el-form-item label="指派:" :label-width="formLabelWidth" required prop="designate" v-if='optionData&&optionData.length > 0'>
-                  <el-select v-model="assignFormData.designate" multiple placeholder="请选择">
+              <!--<el-form-item :label-width="formLabelWidth" v-if='optionData.length > 0'>
+                  <el-input  v-model="inputVal" :editable="false"  class="dialog_content"></el-input>
+              </el-form-item>-->
+              <!--指派-->
+              <el-form-item :label-width="formLabelWidth" required prop="designate" v-if='optionData&&optionData.length > 0'>
+                  <el-select v-model="assignFormData.designate" multiple placeholder="请选择指派人员" class="dialog_content">
                       <el-option
                         v-for="item in optionData"
                         :label="item.name"
@@ -366,18 +351,25 @@
                       </el-option>
                   </el-select>
               </el-form-item>
-              <el-form-item label="审批意见：" :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="同意"></el-input>
+              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+                  <el-option
+                    v-for="value in presetMessageArray"
+                    :label="value.presetMessage"
+                    :value="value.presetMessage"
+                    :key="value.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item  :label-width="formLabelWidth">
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="同意" class="dialog_content"></el-input>
               </el-form-item>
             </el-form>
           </template>
           <template v-if="action === 'rejectAble'">
             <el-form label-position="left" >
-              <el-form-item label="审批意见：" :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="驳回"></el-input>
-              </el-form-item>
-              <el-form-item label="驳回到：" :label-width="formLabelWidth" >
-                <el-select v-model='rejectTo' placeholder="请选择节点">
+              <el-form-item  :label-width="formLabelWidth" >
+                <el-select v-model='rejectTo' placeholder="请选择驳回节点" class="dialog_content">
                   <el-option
                     v-for="node in nodeList"
                     :key="node.value"
@@ -386,63 +378,95 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-				<el-form-item label="是否重走流程：" :label-width="formLabelWidth">
-					<el-radio class="radio" v-model="isRepeat" label="1">重走流程</el-radio>
-					<el-radio class="radio" v-model="isRepeat" label="2">不重走流程</el-radio>
-				</el-form-item>
+              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+                  <el-option
+                    v-for="value in presetMessageArray"
+                    :label="value.presetMessage"
+                    :value="value.presetMessage"
+                    :key="value.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item :label-width="formLabelWidth">
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="驳回" class="dialog_content"></el-input>
+              </el-form-item>
+              <el-form-item :label-width="formLabelWidth">
+                <el-radio class="radio" v-model="isRepeat" label="1" class="radio_isRepeat">重走流程</el-radio>
+                <el-radio class="radio" v-model="isRepeat" label="2">不重走流程</el-radio>
+              </el-form-item>
             </el-form>
           </template>
-          <!--<template v-else-if="action === 'assignAble'">
-            <el-form label-position="left">
-              <el-form-item label="审批意见：" :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="指派"></el-input>
-              </el-form-item>
-              <el-form-item label="人员：" :label-width="formLabelWidth">
-                <el-select v-model='rejectTo' placeholder="请选择人员">
-                  <el-option
-                    v-for="node in nodeList"
-                    :key="node.value"
-                    :label="node.key"
-                    :value="node.value">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-form>
-          </template>-->
           <template v-if="action === 'refuseAble'">
             <el-form label-position="left">
-              <el-form-item label="审批意见：" :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="不同意"></el-input>
+              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+                  <el-option
+                    v-for="value in presetMessageArray"
+                    :label="value.presetMessage"
+                    :value="value.presetMessage"
+                    :key="value.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item  :label-width="formLabelWidth">
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="不同意" class="dialog_content"></el-input>
               </el-form-item>
             </el-form>
           </template>
-
-
           <template v-if="action === 'addsignAble'" class="addsign">
             <el-form label-position="left">
-              <el-form-item label="人员：" :label-width="formLabelWidth">
+              <el-form-item :label-width="formLabelWidth">
                 <el-ref :is-muti-select="true"
                         :ref-code="refcode"
                         :field="field"
                         :template-value="refTemplateValue"
-                        width="300px"
                         :editable="isEdit"
-                        placeholder="请选择">
+                        placeholder="请选择加签人员"
+                        class="dialog_content"
+                        >
 		            </el-ref>
+              </el-form-item>
+              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+                  <el-option
+                    v-for="value in presetMessageArray"
+                    :label="value.presetMessage"
+                    :value="value.presetMessage"
+                    :key="value.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item  :label-width="formLabelWidth">
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="加签" class="dialog_content"></el-input>
               </el-form-item>
             </el-form>
           </template>
           <template v-if="action === 'delegateAble'" class="addsign">
             <el-form label-position="left">
-              <el-form-item label="人员：" :label-width="formLabelWidth">
+              <el-form-item :label-width="formLabelWidth">
                 <el-ref :is-muti-select="false"
                         :ref-code="refcode"
                         :field="field"
                         :template-value="refTemplateValue"
-                        width="300px"
                         :editable="isEdit"
-                        placeholder="请选择">
+                        placeholder="请选择改派人员"
+                        class="dialog_content"
+                        >
 		            </el-ref>
+              </el-form-item>
+              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+                  <el-option
+                    v-for="value in presetMessageArray"
+                    :label="value.presetMessage"
+                    :value="value.presetMessage"
+                    :key="value.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item  :label-width="formLabelWidth">
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="改派" class="dialog_content"></el-input>
               </el-form-item>
             </el-form>
           </template>
@@ -486,6 +510,9 @@ export default {
   name: 'IfbpInitiateFlow',
   data() {
     return {
+      // 同意消息预置数组
+      presetMessageArray: [],
+      presetMessageStr: "",
       // 审批组件
       approvalComponent: true,
       mainProcessInstanceId:"",
@@ -508,6 +535,7 @@ export default {
       author: "",
       isNext: false,
       isEnd: false,
+      has_preset_message:false,
       waitApproves: [],
       titleNumber: "...",
       isSponsor: false,
@@ -587,7 +615,7 @@ export default {
         refuseAble: "拒绝",
 	      recallAble:"收回"
       },
-      formLabelWidth: "96px",
+      formLabelWidth: "0px",
       assignFormData:{
           designate:[]
       },
@@ -922,17 +950,6 @@ export default {
 	                        curTime = " ";
 	                      }
 
-	                      // 处理历史记录信息
-	                      /**var message;
-	                      if (item.taskComments) {
-	                       if (item.taskComments[0]) {
-	                         message = item.taskComments[0].message;
-	                       } else {
-	                         message = " ";
-	                       }
-	                      } else {
-	                       message = "";
-	                      }*/
 	                      // 审批历史记录
 	                      if (deleteReason != "删除" && deleteReason != "待审批" && deleteReason != "审批后撤回") {
 	                        vm.listData.push({
@@ -1156,12 +1173,7 @@ export default {
 			        vm.$message.error("获取驳回列表失败！");
           });
 
-      } 
-      /**else if (vm.action === "assignAble") {
-        vm.getAssignment();
-	      vm.dialogFormVisible = true;
-      } */
-      else if (vm.action === "addsignAble") {
+      } else if (vm.action === "addsignAble") {
         vm.dialogFormVisible = true;
       } else if (vm.action === "delegateAble") {
         vm.dialogFormVisible = true;
@@ -1211,12 +1223,7 @@ export default {
           }).catch(function(error) {
 			        vm.$message.error("获取驳回列表失败！");
           });
-        }
-        /**else if (vm.action === "assignAble") {
-          vm.getAssignment();
-	        vm.dialogFormVisible = true;
-        }*/
-         else if (vm.action === "addsignAble") {
+        } else if (vm.action === "addsignAble") {
 			      vm.dialogFormVisible = true;
         } else if (vm.action === "delegateAble") {
 			      vm.dialogFormVisible = true;
@@ -1295,7 +1302,7 @@ export default {
                     var param_assign_value = {};
                     param_assign_value[activityDefId] = vm.assignFormData.designate;
                     if ( vm.opinion === "") {
-                      vm.opinion = "指派";
+                        vm.opinion = "指派";
                       } 
                     var obj = {}; 
                     obj.param_assign_info = param_assign_value;
@@ -1322,13 +1329,9 @@ export default {
                           type: "success",
                           message: "处理成功"
                         });
-          //            vm.$router.push(url);
                         vm.requestHistory();
                         vm.requestAction();
                         vm.isAgree = false;
-          //            vm.requestPerson();
-          //            vm.approveState();
-          //            vm.historyList();
                         vm.$emit("afterAction",vm.action);
                         vm.refreshWidget();
                       } else if (response && response.data && response.data.status === false) {
@@ -1371,13 +1374,9 @@ export default {
                   type: "success",
                   message: "处理成功"
                 });
-  //            vm.$router.push(url);
                 vm.requestHistory();
                 vm.requestAction();
                 vm.isAgree = false;
-  //            vm.requestPerson();
-  //            vm.approveState();
-  //            vm.historyList();
                 vm.$emit("afterAction",vm.action);
                 vm.refreshWidget();
               } else if (response && response.data && response.data.status === false) {
@@ -1458,13 +1457,9 @@ export default {
                     type: "success",
                     message: "已拒绝"
                   });
-          //      vm.$router.push(url);
                   vm.requestHistory();
                   vm.requestAction();
                   vm.isAgree = false;
-          //      vm.requestPerson();
-          //      vm.approveState();
-          //      vm.historyList();
 	                vm.$emit("afterAction",vm.action);
                   vm.refreshWidget();
                 } else if (
@@ -1493,9 +1488,9 @@ export default {
           var param_reject_activity = vm.rejectTo;
           obj.param_note = vm.opinion;
           obj.param_reject_activity = param_reject_activity;
-		  var em = {};
-		  em.isRepeat = vm.isRepeat;
-		  obj.eParam = em;
+		      var em = {};
+		      em.isRepeat = vm.isRepeat;
+		      obj.eParam = em;
           var param = JSON.stringify(obj);
           var params;
           if (vm.rejectTo === "REJECTTOINIT") {
@@ -1536,13 +1531,9 @@ export default {
                     type: "success",
                     message: "驳回成功"
                   });
-    //              vm.$router.push(url);
                     vm.requestHistory();
                     vm.requestAction();
                     vm.isAgree = false;
-    //              vm.requestPerson();
-    //              vm.approveState();
-    //              vm.historyList();
                     vm.$emit("afterAction",vm.action);
                     vm.refreshWidget();
                 } else if (
@@ -1597,13 +1588,9 @@ export default {
             type: "success",
             message: "改派成功"
             });
-    //      vm.$router.push(url);
             vm.requestHistory();
             vm.requestAction();
             vm.isAgree = false;
-    //      vm.requestPerson();
-    //      vm.approveState();
-    //      vm.historyList();
             vm.$emit("afterAction",vm.action);
             vm.refreshWidget();
           } else if (
@@ -1660,9 +1647,6 @@ export default {
               vm.requestHistory();
               vm.requestAction();
               vm.isAgree = false;
-      //      this.requestPerson();
-      //      this.approveState();
-      //      this.historyList();
               vm.$emit("afterAction",vm.action);
               vm.refreshWidget();
             } else if (
@@ -1682,58 +1666,7 @@ export default {
               message: "请求失败"
             });
           });
-        }
-        /**else if (vm.action === "assignAble") {
-          vm.nodeList.forEach(function(item, index) {
-            if (item.value == vm.rejectTo) {
-            vm.remoteUserId = item.remoteUserId;
-            }
-          });
-          vm.$http({
-            url: "/ifbp-bpm-service/approval/action",
-            method: "post",
-            data: {
-            taskId: vm.params.task_id,
-            action: "agree",
-            comment: vm.opinion,
-            processInstanceId: vm.params.processInstanceId,
-            activityId: vm.rejectTo,
-            remoteUserId: vm.remoteUserId
-            }
-          }).then(function(response) {
-            vm.dialogFormVisible = false;
-              if (response && response.data && response.data.status === 1) {
-                  vm.dialogFormVisible = false;
-                  vm.$message({
-                    type: "success",
-                    message: "指派成功"
-                  });
-      //      vm.$router.push(url);
-              vm.requestHistory();
-              vm.requestAction();
-              vm.isAgree = false;
-      //      vm.requestPerson();
-      //      vm.approveState();
-      //      vm.historyList();
-            } else if (
-              response &&
-              response.data &&
-              response.data.status === 0
-            ) {
-              vm.$message({
-                type: "error",
-                message: response.data.msg
-              });
-            }
-          }).catch(function(error) {
-            vm.dialogFormVisible = false;
-            vm.$message({
-                type: "error",
-                message: "请求失败"
-            });
-          });
-        }*/
-        else if(vm.action === "recallAble"){
+        } else if(vm.action === "recallAble"){
           var obj = {};
           obj.param_note = "recall";
           var param = JSON.stringify(obj);
@@ -1775,14 +1708,11 @@ export default {
       }
       vm.rejectTo = "";
       vm.opinion = "";
-  //  this.userId = "";
-  //  this.$emit("afterAction",this.action);
     },
     cancel() {
         this.dialogFormVisible = false;
         this.rejectTo = "";
         this.opinion = "";
-  //    this.userId = "";
       },
 
     isEnable() {
@@ -1802,7 +1732,6 @@ export default {
       }
     },
     resetForm() {
-      debugger;
       var vm = this;
       vm.$refs["assignFormRef"].resetFields();
       vm.dialogVisible = false
@@ -1847,6 +1776,7 @@ export default {
           if(vm.approvalComponent){
             vm.requestHistory();
             vm.requestAction();
+            vm.getFCPresetMessage();
           }
         } 
       }).catch(function(error) {
@@ -1867,32 +1797,30 @@ export default {
         });
     },
 
-    /**initiateProcess() {
+    getFCPresetMessage() {
       var vm = this;
-      var params = {
-        buzicode: "KHGL",
-        sceneCode: vm.params_01.sceneCode,
-        processInstanceName: "个人客户流程",
-        businessKey: vm.pk,
-        mdPK: vm.pk
-      };
       vm.$http({
-        url: "/ifbp-bpm-service/proc/start",
-        method: "post",
-        data: params
-      }).then(function(res) {
-          if (res.data.status === 1) {
-            vm.$message({
-              type: "success",
-              message: "发起流程成功"
-            });
-          } else {
-            vm.$message.error(res.data.msg);
+          url: "/riart/fbpworkflows/getFCPresetMessage",
+          method: "get"
+        }).then(function(res) {
+          if(response.data.status === true){
+            if(response.data.data){
+              vm.presetMessageArray = res.data.data;
+              vm.has_preset_message = true;
+            }
+          }else{
+              vm.presetMessageArray = [];
           }
         }).catch(function() {
-          vm.$message.error("发起失败");
+          //vm.$message.error("请求失败！");
         });
-    }*/ 
+    },
+    handlePresetMessageChange(item){
+      var vm = this;
+      vm.presetMessageStr = item;
+      vm.opinion = item;
+    }
+    
   },
   created() {
       this.doParams();
@@ -2050,7 +1978,6 @@ export default {
   white-space: nowrap;
 }
 .titleAction span{
-  /**color: #888;*/
   color: #000000;
 }
 #search-container {
@@ -2339,5 +2266,13 @@ export default {
 }
 .btnLists .more-btn .btn-more::before{
   margin-left: 8px !important;
+}
+.dialog_content{
+  width: 368px !important;
+  /*margin-left: 16px !important;*/
+  /*margin-right: 16px !important;*/
+}
+.radio_isRepeat{
+  margin-left: 2px !important;
 }
 </style>
