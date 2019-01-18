@@ -392,7 +392,7 @@
                 <el-input type="textarea" v-model="opinion" :rows="2" placeholder="驳回" class="dialog_content"></el-input>
               </el-form-item>
               <el-form-item :label-width="formLabelWidth">
-                <el-radio class="radio" v-model="isRepeat" label="1" class="radio_isRepeat">重走流程</el-radio>
+                <el-radio v-model="isRepeat" label="1" class="radio_isRepeat">重走流程</el-radio>
                 <el-radio class="radio" v-model="isRepeat" label="2">不重走流程</el-radio>
               </el-form-item>
             </el-form>
