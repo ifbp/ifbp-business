@@ -335,13 +335,10 @@
           </div>
           
             <template v-if="action === 'agreeAble'">
-            <el-form label-position="left" ref="assignFormRef" :model="assignFormData" :rules="rules">
-              <!--<el-form-item :label-width="formLabelWidth" v-if='optionData.length > 0'>
-                  <el-input  v-model="inputVal" :editable="false"  class="dialog_content"></el-input>
-              </el-form-item>-->
+            <el-form label-position="left" ref="assignFormRef" :model="assignFormData" :rules="rules" class="dialog_content">
               <!--指派-->
-              <el-form-item :label-width="formLabelWidth" required prop="designate" v-if='optionData&&optionData.length > 0'>
-                  <el-select v-model="assignFormData.designate" multiple placeholder="请选择指派人员" class="dialog_content">
+              <el-form-item required prop="designate" v-if='optionData&&optionData.length > 0'>
+                  <el-select v-model="assignFormData.designate" multiple placeholder="请选择指派人" >
                       <el-option
                         v-for="item in optionData"
                         :label="item.name"
@@ -351,8 +348,8 @@
                       </el-option>
                   </el-select>
               </el-form-item>
-              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
-                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+              <el-form-item   v-if = 'has_preset_message' >
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" >
                   <el-option
                     v-for="value in presetMessageArray"
                     :label="value.presetMessage"
@@ -361,15 +358,15 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item  :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="同意" class="dialog_content"></el-input>
+              <el-form-item  >
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="同意"></el-input>
               </el-form-item>
             </el-form>
           </template>
           <template v-if="action === 'rejectAble'">
-            <el-form label-position="left" >
-              <el-form-item  :label-width="formLabelWidth" >
-                <el-select v-model='rejectTo' placeholder="请选择驳回节点" class="dialog_content">
+            <el-form label-position="left" class="dialog_content">
+              <el-form-item   >
+                <el-select v-model='rejectTo' placeholder="请选择驳回节点">
                   <el-option
                     v-for="node in nodeList"
                     :key="node.value"
@@ -378,8 +375,8 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
-                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+              <el-form-item  v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" >
                   <el-option
                     v-for="value in presetMessageArray"
                     :label="value.presetMessage"
@@ -388,19 +385,19 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="驳回" class="dialog_content"></el-input>
+              <el-form-item >
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="驳回" ></el-input>
               </el-form-item>
-              <el-form-item :label-width="formLabelWidth">
+              <el-form-item >
                 <el-radio v-model="isRepeat" label="1" class="radio_isRepeat">重走流程</el-radio>
                 <el-radio class="radio" v-model="isRepeat" label="2">不重走流程</el-radio>
               </el-form-item>
             </el-form>
           </template>
           <template v-if="action === 'refuseAble'">
-            <el-form label-position="left">
-              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
-                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+            <el-form label-position="left" class="dialog_content">
+              <el-form-item  v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" >
                   <el-option
                     v-for="value in presetMessageArray"
                     :label="value.presetMessage"
@@ -409,26 +406,25 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item  :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="不同意" class="dialog_content"></el-input>
+              <el-form-item >
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="不同意"></el-input>
               </el-form-item>
             </el-form>
           </template>
           <template v-if="action === 'addsignAble'" class="addsign">
-            <el-form label-position="left">
-              <el-form-item :label-width="formLabelWidth">
+            <el-form label-position="left" class="dialog_content">
+              <el-form-item >
                 <el-ref :is-muti-select="true"
                         :ref-code="refcode"
                         :field="field"
                         :template-value="refTemplateValue"
                         :editable="isEdit"
-                        placeholder="请选择加签人员"
-                        class="dialog_content"
+                        placeholder="请选择加签人"
                         >
 		            </el-ref>
               </el-form-item>
-              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
-                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+              <el-form-item v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" >
                   <el-option
                     v-for="value in presetMessageArray"
                     :label="value.presetMessage"
@@ -437,26 +433,25 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item  :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="加签" class="dialog_content"></el-input>
+              <el-form-item >
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="加签"></el-input>
               </el-form-item>
             </el-form>
           </template>
           <template v-if="action === 'delegateAble'" class="addsign">
-            <el-form label-position="left">
-              <el-form-item :label-width="formLabelWidth">
+            <el-form label-position="left" class="dialog_content">
+              <el-form-item >
                 <el-ref :is-muti-select="false"
                         :ref-code="refcode"
                         :field="field"
                         :template-value="refTemplateValue"
                         :editable="isEdit"
-                        placeholder="请选择改派人员"
-                        class="dialog_content"
+                        placeholder="请选择改派人"
                         >
 		            </el-ref>
               </el-form-item>
-              <el-form-item  :label-width="formLabelWidth" v-if = 'has_preset_message'>
-                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语" class="dialog_content">
+              <el-form-item   v-if = 'has_preset_message'>
+                <el-select v-model="presetMessageStr" @change="handlePresetMessageChange" placeholder="常用审批语">
                   <el-option
                     v-for="value in presetMessageArray"
                     :label="value.presetMessage"
@@ -465,8 +460,8 @@
                   </el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item  :label-width="formLabelWidth">
-                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="改派" class="dialog_content"></el-input>
+              <el-form-item >
+                <el-input type="textarea" v-model="opinion" :rows="2" placeholder="改派"></el-input>
               </el-form-item>
             </el-form>
           </template>
@@ -615,7 +610,6 @@ export default {
         refuseAble: "拒绝",
 	      recallAble:"收回"
       },
-      formLabelWidth: "0px",
       assignFormData:{
           designate:[]
       },
@@ -1864,11 +1858,6 @@ export default {
   .flow-button-submit{
     margin: 16px 0 16px 16px;
   }
-  ul,li{
-    padding:0;
-    margin:0;
-    list-style:none
-  }
   .list-panel1 {
     height: 104px;
     width: 100%;
@@ -2267,12 +2256,7 @@ export default {
 .btnLists .more-btn .btn-more::before{
   margin-left: 8px !important;
 }
-.dialog_content{
-  width: 368px !important;
-  /*margin-left: 16px !important;*/
-  /*margin-right: 16px !important;*/
-}
-.radio_isRepeat{
-  margin-left: 2px !important;
+.dialog_content .el-form-item__content {
+    width: 100%;
 }
 </style>
